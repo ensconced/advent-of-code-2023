@@ -19,7 +19,7 @@ BIN_DIR=bin
 # Deduplicating is necessary for the case where we're compiling the test-utils project, where lib.c
 # actually resolves to the same file as test-utils/lib.c, which would otherwise mean we'd get
 # duplicate symbol errors.
-SOURCES = $(shell echo test.c lib.c ../test-utils/lib.c | xargs -n 1 realpath 2>/dev/null | sort | uniq)
+SOURCES = $(shell echo test.c lib.c ../file_utils/lib.c | xargs -n 1 realpath 2>/dev/null | sort | uniq)
 
 $(BIN_DIR)/test: $(SOURCES)
 	mkdir -p $(BIN_DIR)
