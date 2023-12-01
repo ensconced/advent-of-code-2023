@@ -1,14 +1,20 @@
-# Modern C
+# Advent of code 2023
 
-### How to run the tests for a project
+### Testing everything
 
 ```
-cd ./projects/demo
+make
+```
+
+### Running the tests for a single project
+
+```
+cd ./projects/day1
 make test
 ```
 
 ### Creating a new project
 
 ```
-make new name=project-name
+make new name=day1
 ```
