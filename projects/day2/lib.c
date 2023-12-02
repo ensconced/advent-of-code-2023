@@ -7,18 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// typedef struct Game {
-//   Round **rounds;
-//   size_t round_count;
-//   int id;
-// } Game;
-
-// typedef struct Round {
-//   int red;
-//   int blue;
-//   int green;
-// } Round;
-
 void take_word(char *word, char **str_pointer) {
   size_t word_len = strlen(word);
   assert(strncmp(*str_pointer, word, word_len) == 0);
@@ -78,33 +66,46 @@ enum Colour take_colour(char **str_pointer) {
   exit(1);
 }
 
-// 3 blue, 4 red
+Round *maybe_take_round(char **str_pointer) {
+  int red_draw_count = 0;
+  int green_draw_count = 0;
+  int blue_draw_count = 0;
 
-// Round *maybe_take_round(char **str_pointer) {
-//   Round *round = calloc(1, sizeof(Round));
+  int draw_count;
+  do {
+    draw_count = maybe_take_natural_number(str_pointer);
+    if (draw_count) {
+      take_word(" ", str_pointer);
+      enum Colour colour = take_colour(str_pointer);
+      if (colour == RED) {
+        red_draw_count = draw_count;
+      } else if (colour == GREEN) {
+        green_draw_count = draw_count;
+      } else if (colour == BLUE) {
+        blue_draw_count = draw_count;
+      }
 
-//   int draw_count;
-//   do {
-//     draw_count = maybe_take_natural_number(str_pointer);
-//     if (draw_count) {
-//       take_word(" ", str_pointer);
-//       enum Colour colour = take_colour();
-//       if (colour == RED) {
-//         round->red = draw_count;
-//       } else if (colour == GREEN) {
-//         round->green = draw_count;
-//       } else if (colour == BLUE) {
-//         round->blue = draw_count;
-//       }
+      if ((*str_pointer)[0] == '\0' || maybe_take_word("; ", str_pointer)) {
+        break;
+      }
+      take_word(", ", str_pointer);
+    }
+  } while (draw_count);
 
-//       if (maybe_take_end_of_round()) {
-//         break;
-//       }
-//     }
-//   } while (draw_count);
+  if (draw_count) {
+    Round *round = calloc(1, sizeof(Round));
+    if (round == NULL) {
+      printf("failed to allocate round\n");
+      exit(1);
+    }
+    round->red = red_draw_count;
+    round->green = green_draw_count;
+    round->blue = blue_draw_count;
+    return round;
+  }
 
-//   return round;
-// }
+  return NULL;
+}
 
 // Round **take_rounds(size_t *round_count_result) {
 //   size_t rounds_capacity = 256;
