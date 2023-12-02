@@ -64,6 +64,31 @@ void test_take_colour(void) {
   assert(strcmp(str3, " foo bar") == 0);
 }
 
+void test_maybe_take_round(void) {
+  char *str = "6 green, 3 blue; 3 red, 1 green; 4 green, 3 red, 5 blue";
+  Round *round1 = maybe_take_round(&str);
+  assert(round1->red == 0);
+  assert(round1->green == 6);
+  assert(round1->blue == 3);
+  assert(strcmp(str, "3 red, 1 green; 4 green, 3 red, 5 blue") == 0);
+
+  Round *round2 = maybe_take_round(&str);
+  assert(round2->red == 3);
+  assert(round2->green == 1);
+  assert(round2->blue == 0);
+  assert(strcmp(str, "4 green, 3 red, 5 blue") == 0);
+
+  Round *round3 = maybe_take_round(&str);
+  assert(round3->red == 3);
+  assert(round3->green == 4);
+  assert(round3->blue == 5);
+  assert(strcmp(str, "") == 0);
+
+  Round *round4 = maybe_take_round(&str);
+  assert(round4 == NULL);
+  assert(strcmp(str, "") == 0);
+}
+
 int main(void) {
   test_take_word();
   test_maybe_take_word();
@@ -71,4 +96,5 @@ int main(void) {
   test_take_natural_number();
   test_take_header_returning_game_id();
   test_maybe_take_natural_number();
+  test_maybe_take_round();
 }
