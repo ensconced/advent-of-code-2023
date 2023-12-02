@@ -191,4 +191,5 @@ int main(void) {
   test_parse_line();
 
   printf("part 1: %d\n", sum_possible_game_ids("./inputs/input.txt"));
+  printf("part 2: %d\n", sum_game_powers("./inputs/input.txt"));
 }

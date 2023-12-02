@@ -165,6 +165,22 @@ bool game_is_possible(Game game) {
   return true;
 }
 
+int game_power(Game game) {
+  int min_red = 0;
+  int min_green = 0;
+  int min_blue = 0;
+  for (size_t i = 0; i < game.round_count; ++i) {
+    Round *round = game.rounds[i];
+    if (round->red > min_red)
+      min_red = round->red;
+    if (round->green > min_green)
+      min_green = round->green;
+    if (round->blue > min_blue)
+      min_blue = round->blue;
+  }
+  return min_red * min_green * min_blue;
+}
+
 int sum_possible_game_ids(char *input_path) {
   FileLines game_lines = read_file_lines(input_path);
   int result = 0;
@@ -173,6 +189,16 @@ int sum_possible_game_ids(char *input_path) {
     if (game_is_possible(game)) {
       result += game.id;
     }
+  }
+  return result;
+}
+
+int sum_game_powers(char *input_path) {
+  FileLines game_lines = read_file_lines(input_path);
+  int result = 0;
+  for (size_t i = 0; i < game_lines.line_count; ++i) {
+    Game game = parse_line(game_lines.lines[i]);
+    result += game_power(game);
   }
   return result;
 }
