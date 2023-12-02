@@ -107,29 +107,29 @@ Round *maybe_take_round(char **str_pointer) {
   return NULL;
 }
 
-// Round **take_rounds(size_t *round_count_result) {
-//   size_t rounds_capacity = 256;
-//   size_t round_count = 0;
-//   Round **rounds = malloc(rounds_capacity * sizeof(Round *));
-//   if (rounds == NULL) {
-//     println("failed to allocate rounds\n");
-//     exit(1);
-//   }
-//   Round *round;
-//   do {
-//     round = maybe_take_round();
-//     if (round) {
-//       if (round_count == rounds_capacity) {
-//         println("too many rounds\n");
-//         exit(1);
-//       }
-//       rounds[round_count++] = round;
-//     }
+Round **take_rounds(size_t *round_count_result, char **str_pointer) {
+  size_t rounds_capacity = 256;
+  size_t round_count = 0;
+  Round **rounds = malloc(rounds_capacity * sizeof(Round *));
+  if (rounds == NULL) {
+    printf("failed to allocate rounds\n");
+    exit(1);
+  }
+  Round *round;
+  do {
+    round = maybe_take_round(str_pointer);
+    if (round) {
+      if (round_count == rounds_capacity) {
+        printf("too many rounds\n");
+        exit(1);
+      }
+      rounds[round_count++] = round;
+    }
 
-//   } while (round == NULL);
-//   *round_count_result = round_count;
-//   return rounds;
-// }
+  } while (round != NULL);
+  *round_count_result = round_count;
+  return rounds;
+}
 
 // Game parse_line(char *line, size_t line_index) {
 //   size_t game_id = take_header_returning_game_id(&line);
