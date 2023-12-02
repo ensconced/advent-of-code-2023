@@ -137,6 +137,48 @@ void test_take_rounds(void) {
   free(rounds);
 }
 
+void test_parse_line(void) {
+  char *line = "Game 2: 2 red, 7 green; 13 green, 2 blue, 4 red; 4 green, 5 "
+               "red, 1 blue; 1 blue, 9 red, 1 green";
+  Game game = parse_line(line);
+  size_t expected_round_count = 4;
+  assert(game.round_count == expected_round_count);
+
+  Round expected_round_1 = (Round){
+      .red = 2,
+      .green = 7,
+      .blue = 0,
+  };
+  Round expected_round_2 = (Round){
+      .red = 4,
+      .green = 13,
+      .blue = 2,
+  };
+  Round expected_round_3 = (Round){
+      .red = 5,
+      .green = 4,
+      .blue = 1,
+  };
+  Round expected_round_4 = (Round){
+      .red = 9,
+      .green = 1,
+      .blue = 1,
+  };
+  Round expected_rounds[] = {expected_round_1, expected_round_2,
+                             expected_round_3, expected_round_4};
+
+  for (size_t i = 0; i < expected_round_count; ++i) {
+    Round *result_round = game.rounds[i];
+    Round expected_round = expected_rounds[i];
+    assert(result_round->red == expected_round.red);
+    assert(result_round->green == expected_round.green);
+    assert(result_round->blue == expected_round.blue);
+    free(result_round);
+  }
+  free(game.rounds);
+  assert(game.id == 2);
+}
+
 int main(void) {
   test_take_word();
   test_maybe_take_word();
@@ -146,4 +188,5 @@ int main(void) {
   test_maybe_take_natural_number();
   test_maybe_take_round();
   test_take_rounds();
+  test_parse_line();
 }

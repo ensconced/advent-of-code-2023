@@ -131,14 +131,15 @@ Round **take_rounds(size_t *round_count_result, char **str_pointer) {
   return rounds;
 }
 
-// Game parse_line(char *line, size_t line_index) {
-//   size_t game_id = take_header_returning_game_id(&line);
-//   size_t round_count;
-//   Round **rounds = take_rounds(&round_count);
+Game parse_line(char *line) {
+  char **line_pointer = &line;
+  int game_id = take_header_returning_game_id(line_pointer);
+  size_t round_count;
+  Round **rounds = take_rounds(&round_count, line_pointer);
 
-//   return (Game){
-//       .rounds = rounds,
-//       .round_count = round_count,
-//       .id = line_index,
-//   };
-// }
+  return (Game){
+      .rounds = rounds,
+      .round_count = round_count,
+      .id = game_id,
+  };
+}

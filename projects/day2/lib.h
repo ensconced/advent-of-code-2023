@@ -23,3 +23,4 @@ int take_header_returning_game_id(char **str_pointer);
 int maybe_take_natural_number(char **str_pointer);
 Round *maybe_take_round(char **str_pointer);
 Round **take_rounds(size_t *round_count_result, char **str_pointer);
+Game parse_line(char *line);
