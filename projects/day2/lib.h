@@ -24,3 +24,4 @@ int maybe_take_natural_number(char **str_pointer);
 Round *maybe_take_round(char **str_pointer);
 Round **take_rounds(size_t *round_count_result, char **str_pointer);
 Game parse_line(char *line);
+int sum_possible_game_ids(char *input_path);
