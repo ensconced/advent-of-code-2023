@@ -189,4 +189,6 @@ int main(void) {
   test_maybe_take_round();
   test_take_rounds();
   test_parse_line();
+
+  printf("part 1: %d\n", sum_possible_game_ids("./inputs/input.txt"));
 }

@@ -1,4 +1,5 @@
 #include "./lib.h"
+#include "../file_utils/lib.h"
 #include <assert.h>
 #include <ctype.h>
 #include <stdbool.h>
@@ -9,7 +10,10 @@
 
 void take_word(char *word, char **str_pointer) {
   size_t word_len = strlen(word);
-  assert(strncmp(*str_pointer, word, word_len) == 0);
+  if (strncmp(*str_pointer, word, word_len)) {
+    printf("expected word \"%s\" to start with \"%s\"\n", *str_pointer, word);
+    exit(1);
+  }
   *str_pointer += word_len;
 }
 
@@ -85,7 +89,10 @@ Round *maybe_take_round(char **str_pointer) {
         blue_draw_count = draw_count;
       }
 
-      if ((*str_pointer)[0] == '\0' || maybe_take_word("; ", str_pointer)) {
+      char next_char = (*str_pointer)[0];
+
+      if (next_char == '\0' || next_char == '\n' ||
+          maybe_take_word("; ", str_pointer)) {
         break;
       }
       take_word(", ", str_pointer);
@@ -142,4 +149,30 @@ Game parse_line(char *line) {
       .round_count = round_count,
       .id = game_id,
   };
+}
+
+int TOTAL_RED_COUNT = 12;
+int TOTAL_GREEN_COUNT = 13;
+int TOTAL_BLUE_COUNT = 14;
+
+bool game_is_possible(Game game) {
+  for (size_t i = 0; i < game.round_count; ++i) {
+    Round *round = game.rounds[i];
+    if (round->red > TOTAL_RED_COUNT || round->green > TOTAL_GREEN_COUNT ||
+        round->blue > TOTAL_BLUE_COUNT)
+      return false;
+  }
+  return true;
+}
+
+int sum_possible_game_ids(char *input_path) {
+  FileLines game_lines = read_file_lines(input_path);
+  int result = 0;
+  for (size_t i = 0; i < game_lines.line_count; ++i) {
+    Game game = parse_line(game_lines.lines[i]);
+    if (game_is_possible(game)) {
+      result += game.id;
+    }
+  }
+  return result;
 }
