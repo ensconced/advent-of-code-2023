@@ -54,5 +54,7 @@ void maybe_take_natural_number(char **str_pointer, char *result_buffer,
   char first_digit = (*str_pointer)[0];
   if (isdigit(first_digit) && first_digit != '0') {
     take_natural_number(str_pointer, result_buffer, result_buffer_capacity);
+  } else {
+    result_buffer[0] = '\0';
   }
 }
