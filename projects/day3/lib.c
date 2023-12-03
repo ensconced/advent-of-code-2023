@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-const size_t NUMBERS_CAPACITY = 1024;
-const size_t SYMBOLS_CAPACITY = 1024;
+const size_t NUMBERS_CAPACITY = 2048;
+const size_t SYMBOLS_CAPACITY = 2048;
 
 Grid parse_input(char *input_path) {
   Coordinates *symbols = malloc(SYMBOLS_CAPACITY * sizeof(Coordinates));
@@ -63,4 +63,32 @@ Grid parse_input(char *input_path) {
                 .numbers_len = numbers_len,
                 .symbols = symbols,
                 .symbols_len = symbols_len};
+}
+
+bool number_is_adjacent_to_symbol(PositionedNumber number, Coordinates symbol) {
+  size_t box_min_x = number.start_coords.x == 0 ? 0 : number.start_coords.x - 1;
+  size_t box_max_x = number.start_coords.x + number.str_len + 1;
+  size_t box_min_y = number.start_coords.y == 0 ? 0 : number.start_coords.y - 1;
+  size_t box_max_y = number.start_coords.y + 2;
+  return symbol.x >= box_min_x && symbol.x < box_max_x &&
+         symbol.y >= box_min_y && symbol.y < box_max_y;
+}
+
+bool is_part_number(PositionedNumber number, Grid grid) {
+  for (size_t i = 0; i < grid.symbols_len; ++i) {
+    if (number_is_adjacent_to_symbol(number, grid.symbols[i])) {
+      return true;
+    }
+  }
+  return false;
+}
+
+int sum_part_numbers(Grid grid) {
+  int sum = 0;
+  for (size_t i = 0; i < grid.numbers_len; ++i) {
+    if (is_part_number(grid.numbers[i], grid)) {
+      sum += grid.numbers[i].num;
+    }
+  }
+  return sum;
 }

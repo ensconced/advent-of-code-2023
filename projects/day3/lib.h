@@ -19,3 +19,4 @@ typedef struct {
 } Grid;
 
 Grid parse_input(char *input_path);
+int sum_part_numbers(Grid grid);

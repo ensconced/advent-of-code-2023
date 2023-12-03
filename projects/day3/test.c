@@ -65,4 +65,13 @@ void test_parse_input(void) {
   }
 }
 
-int main(void) { test_parse_input(); }
+int main(void) {
+  test_parse_input();
+  Grid example_grid = parse_input("./inputs/part1_example.txt");
+  int example_result = sum_part_numbers(example_grid);
+  assert(example_result == 4361);
+
+  Grid part1_grid = parse_input("./inputs/input.txt");
+  int result = sum_part_numbers(part1_grid);
+  printf("part 1 result: %d\n", result);
+}
