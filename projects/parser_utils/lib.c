@@ -23,28 +23,36 @@ bool maybe_take_word(char *word, char **str_pointer) {
   return false;
 }
 
-int take_natural_number(char **str_pointer) {
-  size_t max_digits = 15;
-  char buffer[16];
+void take_natural_number(char **str_pointer, char *result_buffer,
+                         size_t result_buffer_capacity) {
+  size_t result_len = 0;
   size_t i;
-  for (i = 0; i < max_digits; ++i) {
-    char possible_digit = (*str_pointer)[0];
+  for (i = 0;; ++i) {
+    char possible_digit = (*str_pointer)[i];
     if (isdigit(possible_digit)) {
-      buffer[i] = possible_digit;
-      (*str_pointer)++;
+      if (i >= result_buffer_capacity - 1) {
+        printf("ran out of space in result buffer\n");
+        exit(1);
+      }
+      result_buffer[i] = possible_digit;
+      result_len++;
     } else {
       break;
     }
   }
-  buffer[i] = '\0';
-  return atoi(buffer);
+  if (result_len == 0) {
+    printf("failed to take natural number\n");
+    exit(1);
+  }
+
+  result_buffer[i] = '\0';
+  (*str_pointer) += result_len;
 }
 
-// return value of zero means no natural number was found
-int maybe_take_natural_number(char **str_pointer) {
+void maybe_take_natural_number(char **str_pointer, char *result_buffer,
+                               size_t result_buffer_capacity) {
   char first_digit = (*str_pointer)[0];
   if (isdigit(first_digit) && first_digit != '0') {
-    return take_natural_number(str_pointer);
+    take_natural_number(str_pointer, result_buffer, result_buffer_capacity);
   }
-  return 0;
 }

@@ -24,20 +24,24 @@ void test_maybe_take_word(void) {
 
 void test_take_natural_number(void) {
   char *str = "1234 hello there";
-  int result = take_natural_number(&str);
-  assert(result == 1234);
+  static const size_t number_buffer_len = 16;
+  char number_buffer[number_buffer_len];
+  take_natural_number(&str, number_buffer, number_buffer_len);
+  assert(strcmp(number_buffer, "1234") == 0);
   assert(strcmp(str, " hello there") == 0);
 }
 
 void test_maybe_take_natural_number(void) {
   char *str1 = "foo bar 1234";
-  int result_for_no_natural_number = maybe_take_natural_number(&str1);
-  assert(result_for_no_natural_number == 0);
+  static const size_t number_buffer_capacity = 16;
+  char number_buffer[number_buffer_capacity];
+  maybe_take_natural_number(&str1, number_buffer, number_buffer_capacity);
+  assert(strcmp(number_buffer, "") == 0);
   assert(strcmp(str1, "foo bar 1234") == 0);
 
   char *str2 = "1234 foo bar";
-  int result_for_natural_number = maybe_take_natural_number(&str2);
-  assert(result_for_natural_number == 1234);
+  maybe_take_natural_number(&str2, number_buffer, number_buffer_capacity);
+  assert(strcmp(number_buffer, "1234") == 0);
   assert(strcmp(str2, " foo bar") == 0);
 }
 
