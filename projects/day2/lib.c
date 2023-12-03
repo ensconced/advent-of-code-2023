@@ -11,7 +11,10 @@
 
 int take_header_returning_game_id(char **str_pointer) {
   take_word("Game ", str_pointer);
-  int game_id = take_natural_number(str_pointer);
+  static const size_t number_buffer_capacity = 16;
+  char number_buffer[number_buffer_capacity];
+  take_natural_number(str_pointer, number_buffer, 16);
+  int game_id = atoi(number_buffer);
   take_word(": ", str_pointer);
   return game_id;
 }
@@ -34,7 +37,11 @@ Round *maybe_take_round(char **str_pointer) {
 
   int draw_count;
   do {
-    draw_count = maybe_take_natural_number(str_pointer);
+    static const size_t num_buffer_capacity = 16;
+    char number_buffer[num_buffer_capacity];
+    maybe_take_natural_number(str_pointer, number_buffer, num_buffer_capacity);
+    draw_count = atoi(number_buffer);
+
     if (draw_count) {
       take_word(" ", str_pointer);
       enum Colour colour = take_colour(str_pointer);
