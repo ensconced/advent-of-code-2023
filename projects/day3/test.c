@@ -10,12 +10,13 @@ bool positioned_numbers_are_equal(PositionedNumber a, PositionedNumber b) {
          a.start_coords.y == b.start_coords.y && a.str_len == b.str_len;
 }
 
-bool coordinates_are_equal(Coordinates a, Coordinates b) {
-  return a.x == b.x && a.y == b.y;
+bool symbols_are_equal(Symbol a, Symbol b) {
+  return a.coordinates.x == b.coordinates.x &&
+         a.coordinates.y == b.coordinates.y && a.character == b.character;
 }
 
 void test_parse_input(void) {
-  Grid grid = parse_input("./inputs/part1_example.txt");
+  Grid grid = parse_input("./inputs/example.txt");
   static const size_t expected_number_count = 10;
   PositionedNumber expected_numbers[expected_number_count] = {
       (PositionedNumber){.num = 467,
@@ -55,23 +56,47 @@ void test_parse_input(void) {
   }
 
   static const size_t expected_symbol_count = 6;
-  Coordinates expected_symbols[expected_symbol_count] = {
-      (Coordinates){.x = 3, .y = 1}, (Coordinates){.x = 6, .y = 3},
-      (Coordinates){.x = 3, .y = 4}, (Coordinates){.x = 5, .y = 5},
-      (Coordinates){.x = 3, .y = 8}, (Coordinates){.x = 5, .y = 8},
+  Symbol expected_symbols[expected_symbol_count] = {
+      (Symbol){
+          .coordinates = (Coordinates){.x = 3, .y = 1},
+          .character = '*',
+      },
+      (Symbol){
+          .coordinates = (Coordinates){.x = 6, .y = 3},
+          .character = '#',
+      },
+      (Symbol){
+          .coordinates = (Coordinates){.x = 3, .y = 4},
+          .character = '*',
+      },
+      (Symbol){
+          .coordinates = (Coordinates){.x = 5, .y = 5},
+          .character = '+',
+      },
+      (Symbol){
+          .coordinates = (Coordinates){.x = 3, .y = 8},
+          .character = '$',
+      },
+      (Symbol){
+          .coordinates = (Coordinates){.x = 5, .y = 8},
+          .character = '*',
+      },
   };
   for (size_t i = 0; i < expected_symbol_count; ++i) {
-    assert(coordinates_are_equal(grid.symbols[i], expected_symbols[i]));
+    assert(symbols_are_equal(grid.symbols[i], expected_symbols[i]));
   }
 }
 
 int main(void) {
   test_parse_input();
-  Grid example_grid = parse_input("./inputs/part1_example.txt");
+  Grid example_grid = parse_input("./inputs/example.txt");
   int example_result = sum_part_numbers(example_grid);
   assert(example_result == 4361);
 
-  Grid part1_grid = parse_input("./inputs/input.txt");
-  int result = sum_part_numbers(part1_grid);
-  printf("part 1 result: %d\n", result);
+  Grid grid = parse_input("./inputs/input.txt");
+  int part1_result = sum_part_numbers(grid);
+  printf("part 1 result: %d\n", part1_result);
+
+  int part2_result = sum_gear_ratios(grid);
+  printf("part 2 result: %d\n", part2_result);
 }

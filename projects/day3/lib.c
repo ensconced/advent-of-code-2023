@@ -9,7 +9,7 @@ const size_t NUMBERS_CAPACITY = 2048;
 const size_t SYMBOLS_CAPACITY = 2048;
 
 Grid parse_input(char *input_path) {
-  Coordinates *symbols = malloc(SYMBOLS_CAPACITY * sizeof(Coordinates));
+  Symbol *symbols = malloc(SYMBOLS_CAPACITY * sizeof(Symbol));
   PositionedNumber *numbers =
       malloc(NUMBERS_CAPACITY * sizeof(PositionedNumber));
 
@@ -46,9 +46,14 @@ Grid parse_input(char *input_path) {
         }
         (*line_ptr)++;
         if (next_char != '.') {
-          Coordinates symbol = {
-              .x = next_char_pos,
-              .y = line_idx,
+          Symbol symbol = {
+              .coordinates =
+                  (Coordinates){
+                      .x = next_char_pos,
+                      .y = line_idx,
+
+                  },
+              .character = next_char,
           };
           if (symbols_len == SYMBOLS_CAPACITY - 1) {
             printf("symbols buffer is full\n");
@@ -65,13 +70,14 @@ Grid parse_input(char *input_path) {
                 .symbols_len = symbols_len};
 }
 
-bool number_is_adjacent_to_symbol(PositionedNumber number, Coordinates symbol) {
+bool number_is_adjacent_to_symbol(PositionedNumber number, Symbol symbol) {
   size_t box_min_x = number.start_coords.x == 0 ? 0 : number.start_coords.x - 1;
   size_t box_max_x = number.start_coords.x + number.str_len + 1;
   size_t box_min_y = number.start_coords.y == 0 ? 0 : number.start_coords.y - 1;
   size_t box_max_y = number.start_coords.y + 2;
-  return symbol.x >= box_min_x && symbol.x < box_max_x &&
-         symbol.y >= box_min_y && symbol.y < box_max_y;
+  return symbol.coordinates.x >= box_min_x &&
+         symbol.coordinates.x < box_max_x &&
+         symbol.coordinates.y >= box_min_y && symbol.coordinates.y < box_max_y;
 }
 
 bool is_part_number(PositionedNumber number, Grid grid) {
@@ -91,4 +97,28 @@ int sum_part_numbers(Grid grid) {
     }
   }
   return sum;
+}
+
+int gear_ratio(Symbol symbol, Grid grid) {
+  if (symbol.character != '*')
+    return 0;
+  int result = 1;
+  int adjacent_words = 0;
+  for (size_t i = 0; i < grid.numbers_len; ++i) {
+    if (number_is_adjacent_to_symbol(grid.numbers[i], symbol)) {
+      if (adjacent_words == 2)
+        return 0;
+      result *= grid.numbers[i].num;
+      adjacent_words++;
+    }
+  }
+  return adjacent_words == 2 ? result : 0;
+}
+
+int sum_gear_ratios(Grid grid) {
+  int result = 0;
+  for (size_t i = 0; i < grid.symbols_len; ++i) {
+    result += gear_ratio(grid.symbols[i], grid);
+  }
+  return result;
 }

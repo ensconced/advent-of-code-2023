@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stddef.h>
 
 typedef struct {
@@ -6,13 +7,18 @@ typedef struct {
 } Coordinates;
 
 typedef struct {
+  Coordinates coordinates;
+  char character;
+} Symbol;
+
+typedef struct {
   Coordinates start_coords;
   size_t str_len;
   int num;
 } PositionedNumber;
 
 typedef struct {
-  Coordinates *symbols;
+  Symbol *symbols;
   size_t symbols_len;
   PositionedNumber *numbers;
   size_t numbers_len;
@@ -20,3 +26,4 @@ typedef struct {
 
 Grid parse_input(char *input_path);
 int sum_part_numbers(Grid grid);
+int sum_gear_ratios(Grid grid);
