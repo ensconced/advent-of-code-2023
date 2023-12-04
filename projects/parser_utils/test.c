@@ -45,9 +45,47 @@ void test_maybe_take_natural_number(void) {
   assert(strcmp(str2, " foo bar") == 0);
 }
 
+void test_maybe_take_whitespace(void) {
+  char *str1 = " \t \t foo bar";
+  bool took1 = maybe_take_whitespace(&str1);
+  assert(took1);
+  assert(strcmp(str1, "foo bar") == 0);
+
+  char *str2 = "foo bar";
+  bool took2 = maybe_take_whitespace(&str2);
+  assert(!took2);
+  assert(strcmp(str2, "foo bar") == 0);
+}
+
+void test_take_whitespace_separated_natural_numbers(void) {
+  char *str1 = "123 \t \t 456 \t \t 789 foo bar";
+  static const size_t result_buffer_capacity = 4;
+  static const size_t number_buffer_capacity = 16;
+  size_t result_buffer_len;
+  char *result_buffer[result_buffer_capacity];
+  take_whitespace_separated_natural_numbers(
+      &str1, result_buffer, &result_buffer_len, result_buffer_capacity,
+      number_buffer_capacity);
+  assert(strcmp(str1, "foo bar") == 0);
+  assert(result_buffer_len == 3);
+
+  char *expected_result1 = "123";
+  char *expected_result2 = "456";
+  char *expected_result3 = "789";
+
+  char *expected_result_buffer[] = {expected_result1, expected_result2,
+                                    expected_result3};
+
+  for (size_t i = 0; i < result_buffer_len; ++i) {
+    assert(strcmp(result_buffer[i], expected_result_buffer[i]) == 0);
+  }
+}
+
 int main(void) {
   test_take_word();
   test_maybe_take_word();
   test_take_natural_number();
   test_maybe_take_natural_number();
+  test_maybe_take_whitespace();
+  test_take_whitespace_separated_natural_numbers();
 }
