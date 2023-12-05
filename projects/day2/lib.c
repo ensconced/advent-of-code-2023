@@ -64,7 +64,7 @@ Round *maybe_take_round(char **str_pointer) {
   } while (draw_count);
 
   if (draw_count) {
-    Round *round = calloc(1, sizeof(Round));
+    Round *round = malloc(sizeof(Round));
     if (round == 0) {
       printf("failed to allocate round\n");
       exit(EXIT_FAILURE);
@@ -153,6 +153,7 @@ int sum_possible_game_ids(char *input_path) {
     if (game_is_possible(game)) {
       result += game.id;
     }
+    free_game(game);
   }
   free_file_lines(game_lines);
   return result;
@@ -164,7 +165,15 @@ int sum_game_powers(char *input_path) {
   for (size_t i = 0; i < game_lines.line_count; ++i) {
     Game game = parse_line(game_lines.lines[i]);
     result += game_power(game);
+    free_game(game);
   }
   free_file_lines(game_lines);
   return result;
+}
+
+void free_game(Game game) {
+  for (size_t i = 0; i < game.round_count; ++i) {
+    free(game.rounds[i]);
+  }
+  free(game.rounds);
 }

@@ -127,6 +127,7 @@ int part2(char *input_path) {
     Card card = cards[i];
     result += card.count;
   }
+  free(cards);
   free_file_lines(file_lines);
   return result;
 }
