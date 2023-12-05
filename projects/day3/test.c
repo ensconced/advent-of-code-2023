@@ -94,4 +94,5 @@ int main(void) {
   Grid grid = parse_input("./inputs/input.txt");
   assert(sum_part_numbers(grid) == 546563);
   assert(sum_gear_ratios(grid) == 91031374);
+  free_grid(grid);
 }

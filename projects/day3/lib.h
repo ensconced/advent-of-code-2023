@@ -27,3 +27,4 @@ typedef struct {
 Grid parse_input(char *input_path);
 int sum_part_numbers(Grid grid);
 int sum_gear_ratios(Grid grid);
+void free_grid(Grid grid);

@@ -5,26 +5,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-const size_t NUMBERS_CAPACITY = 2048;
-const size_t SYMBOLS_CAPACITY = 2048;
+const size_t numbers_capacity = 2048;
+const size_t symbols_capacity = 2048;
+const size_t number_buffer_capacity = 16;
 
 Grid parse_input(char *input_path) {
-  Symbol *symbols = malloc(SYMBOLS_CAPACITY * sizeof(Symbol));
+  Symbol *symbols = malloc(symbols_capacity * sizeof(Symbol));
   PositionedNumber *numbers =
-      malloc(NUMBERS_CAPACITY * sizeof(PositionedNumber));
+      malloc(numbers_capacity * sizeof(PositionedNumber));
 
   size_t symbols_len = 0;
   size_t numbers_len = 0;
 
   FileLines file_lines = read_file_lines(input_path);
   for (size_t line_idx = 0; line_idx < file_lines.line_count; ++line_idx) {
-    char *original_str_pointer = file_lines.lines[line_idx];
-    char *str_pointer_for_advancing = original_str_pointer;
+    char *original_line_pointer = file_lines.lines[line_idx];
+    char *movable_line_pointer = original_line_pointer;
     while (1) {
-      static const size_t number_buffer_capacity = 16;
+      size_t x = (size_t)(movable_line_pointer - original_line_pointer);
+
       char number_buffer[number_buffer_capacity];
-      size_t x = (size_t)(str_pointer_for_advancing - original_str_pointer);
-      maybe_take_numeric_string(&str_pointer_for_advancing, number_buffer,
+      maybe_take_numeric_string(&movable_line_pointer, number_buffer,
                                 number_buffer_capacity);
       if (strlen(number_buffer)) {
         PositionedNumber positioned_number = {
@@ -32,19 +33,19 @@ Grid parse_input(char *input_path) {
             .str_len = strlen(number_buffer),
             .start_coords = (Coordinates){.x = x, .y = line_idx},
         };
-        if (numbers_len == NUMBERS_CAPACITY - 1) {
+        if (numbers_len == numbers_capacity - 1) {
           printf("numbers buffer is full\n");
           exit(EXIT_FAILURE);
         }
         numbers[numbers_len++] = positioned_number;
       } else {
-        char next_char = str_pointer_for_advancing[0];
+        char next_char = movable_line_pointer[0];
         size_t next_char_pos =
-            (size_t)(str_pointer_for_advancing - original_str_pointer);
+            (size_t)(movable_line_pointer - original_line_pointer);
         if (next_char == '\0' || next_char == '\n') {
           break;
         }
-        str_pointer_for_advancing++;
+        movable_line_pointer++;
         if (next_char != '.') {
           Symbol symbol = {
               .coordinates =
@@ -55,7 +56,7 @@ Grid parse_input(char *input_path) {
                   },
               .character = next_char,
           };
-          if (symbols_len == SYMBOLS_CAPACITY - 1) {
+          if (symbols_len == symbols_capacity - 1) {
             printf("symbols buffer is full\n");
             exit(EXIT_FAILURE);
           }
@@ -122,4 +123,9 @@ int sum_gear_ratios(Grid grid) {
     result += gear_ratio(grid.symbols[i], grid);
   }
   return result;
+}
+
+void free_grid(Grid grid) {
+  free(grid.numbers);
+  free(grid.symbols);
 }

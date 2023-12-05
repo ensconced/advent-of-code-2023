@@ -22,3 +22,4 @@ Round **take_rounds(size_t *round_count_result, char **str_pointer);
 Game parse_line(char *line);
 int sum_possible_game_ids(char *input_path);
 int sum_game_powers(char *input_path);
+void free_game(Game game);
