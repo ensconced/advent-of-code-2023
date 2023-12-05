@@ -7,8 +7,9 @@ CFLAGS=-Wall \
 	-Wliteral-range \
 	-Woverflow \
 	-Wimplicit-int \
-	-Werror \
+	-Wreserved-identifier \
 	-pedantic-errors \
+	-Werror \
 	-std=c17 \
 	-fsanitize=address,undefined \
 	-g \

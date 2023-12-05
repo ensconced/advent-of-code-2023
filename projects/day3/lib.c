@@ -18,33 +18,33 @@ Grid parse_input(char *input_path) {
 
   FileLines file_lines = read_file_lines(input_path);
   for (size_t line_idx = 0; line_idx < file_lines.line_count; ++line_idx) {
-    char *initial_str_ptr = file_lines.lines[line_idx];
-    char **line_ptr = &file_lines.lines[line_idx];
+    char *original_str_pointer = file_lines.lines[line_idx];
+    char *str_pointer_for_advancing = original_str_pointer;
     while (1) {
       static const size_t number_buffer_capacity = 16;
       char number_buffer[number_buffer_capacity];
-      size_t x = (size_t)(*line_ptr - initial_str_ptr);
-      maybe_take_natural_number(line_ptr, number_buffer,
+      size_t x = (size_t)(str_pointer_for_advancing - original_str_pointer);
+      maybe_take_numeric_string(&str_pointer_for_advancing, number_buffer,
                                 number_buffer_capacity);
       if (strlen(number_buffer)) {
-        Coordinates start_coords = {.x = x, .y = line_idx};
         PositionedNumber positioned_number = {
             .num = atoi(number_buffer),
             .str_len = strlen(number_buffer),
-            .start_coords = start_coords,
+            .start_coords = (Coordinates){.x = x, .y = line_idx},
         };
         if (numbers_len == NUMBERS_CAPACITY - 1) {
           printf("numbers buffer is full\n");
-          exit(1);
+          exit(EXIT_FAILURE);
         }
         numbers[numbers_len++] = positioned_number;
       } else {
-        char next_char = (*line_ptr)[0];
-        size_t next_char_pos = (size_t)(*line_ptr - initial_str_ptr);
+        char next_char = str_pointer_for_advancing[0];
+        size_t next_char_pos =
+            (size_t)(str_pointer_for_advancing - original_str_pointer);
         if (next_char == '\0' || next_char == '\n') {
           break;
         }
-        (*line_ptr)++;
+        str_pointer_for_advancing++;
         if (next_char != '.') {
           Symbol symbol = {
               .coordinates =
@@ -57,13 +57,14 @@ Grid parse_input(char *input_path) {
           };
           if (symbols_len == SYMBOLS_CAPACITY - 1) {
             printf("symbols buffer is full\n");
-            exit(1);
+            exit(EXIT_FAILURE);
           }
           symbols[symbols_len++] = symbol;
         }
       }
     }
   }
+  free_file_lines(file_lines);
   return (Grid){.numbers = numbers,
                 .numbers_len = numbers_len,
                 .symbols = symbols,
