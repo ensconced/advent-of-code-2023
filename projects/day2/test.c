@@ -53,7 +53,7 @@ void test_maybe_take_round(void) {
   free(round3);
 
   Round *round4 = maybe_take_round(&str);
-  assert(round4 == NULL);
+  assert(round4 == 0);
   assert(strcmp(str, "") == 0);
 }
 
@@ -149,6 +149,6 @@ int main(void) {
   test_take_rounds();
   test_parse_line();
 
-  printf("part 1: %d\n", sum_possible_game_ids("./inputs/input.txt"));
-  printf("part 2: %d\n", sum_game_powers("./inputs/input.txt"));
+  assert(sum_possible_game_ids("./inputs/input.txt") == 2683);
+  assert(sum_game_powers("./inputs/input.txt") == 49710);
 }

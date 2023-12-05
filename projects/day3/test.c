@@ -89,14 +89,9 @@ void test_parse_input(void) {
 
 int main(void) {
   test_parse_input();
-  Grid example_grid = parse_input("./inputs/example.txt");
-  int example_result = sum_part_numbers(example_grid);
-  assert(example_result == 4361);
+  assert(sum_part_numbers(parse_input("./inputs/example.txt")) == 4361);
 
   Grid grid = parse_input("./inputs/input.txt");
-  int part1_result = sum_part_numbers(grid);
-  printf("part 1 result: %d\n", part1_result);
-
-  int part2_result = sum_gear_ratios(grid);
-  printf("part 2 result: %d\n", part2_result);
+  assert(sum_part_numbers(grid) == 546563);
+  assert(sum_gear_ratios(grid) == 91031374);
 }

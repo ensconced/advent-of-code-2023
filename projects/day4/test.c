@@ -3,9 +3,6 @@
 #include <stdio.h>
 
 int main(void) {
-  int part1_result = part1("./inputs/input.txt");
-  printf("part 1 result: %d\n", part1_result);
-
-  int part2_result = part2("./inputs/input.txt");
-  printf("part 2 result: %d\n", part2_result);
+  assert(part1("./inputs/input.txt") == 25010);
+  assert(part2("./inputs/input.txt") == 9924412);
 }

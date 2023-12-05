@@ -8,3 +8,4 @@ typedef struct FileLines {
 } FileLines;
 
 FileLines read_file_lines(char *path);
+void free_file_lines(FileLines file_lines);

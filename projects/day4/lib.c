@@ -11,36 +11,36 @@ static size_t number_buffers_capacity = 256;
 
 Card parse_line(char *line) {
   char **line_ptr = &line;
-  take_word("Card ", line_ptr);
+  take_string("Card ", line_ptr);
   maybe_take_whitespace(line_ptr);
   static const size_t number_buffer_capacity = 16;
   char number_buffer[number_buffer_capacity];
-  take_natural_number(line_ptr, number_buffer, number_buffer_capacity);
+  take_numeric_string(line_ptr, number_buffer, number_buffer_capacity);
   int card_idx = atoi(number_buffer);
-  take_word(":", line_ptr);
+  take_string(":", line_ptr);
   maybe_take_whitespace(line_ptr);
 
   char **winning_numbers_buffer =
       malloc(number_buffers_capacity * sizeof(char *));
-  if (winning_numbers_buffer == NULL) {
+  if (winning_numbers_buffer == 0) {
     printf("failed to allocate winning numbers buffer\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   size_t winning_numbers_len;
-  take_whitespace_separated_natural_numbers(
+  take_whitespace_separated_numeric_strings(
       line_ptr, winning_numbers_buffer, &winning_numbers_len,
       number_buffers_capacity, individual_number_buffer_capacity);
 
-  take_word("|", line_ptr);
+  take_string("|", line_ptr);
   maybe_take_whitespace(line_ptr);
 
   char **my_numbers_buffer = malloc(number_buffers_capacity * sizeof(char *));
-  if (my_numbers_buffer == NULL) {
+  if (my_numbers_buffer == 0) {
     printf("failed to allocate my numbers buffer\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   size_t my_numbers_len;
-  take_whitespace_separated_natural_numbers(
+  take_whitespace_separated_numeric_strings(
       line_ptr, my_numbers_buffer, &my_numbers_len, number_buffers_capacity,
       individual_number_buffer_capacity);
 
@@ -99,15 +99,16 @@ int part1(char *input_path) {
     Card card = parse_line(file_lines.lines[i]);
     sum += part1_card_score(card);
   }
+  free_file_lines(file_lines);
   return sum;
 }
 
 int part2(char *input_path) {
   FileLines file_lines = read_file_lines(input_path);
   Card *cards = malloc(file_lines.line_count * sizeof(Card));
-  if (cards == NULL) {
+  if (cards == 0) {
     printf("failed to allocate cards buffer\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   for (size_t i = 0; i < file_lines.line_count; ++i) {
     cards[i] = parse_line(file_lines.lines[i]);
@@ -126,5 +127,6 @@ int part2(char *input_path) {
     Card card = cards[i];
     result += card.count;
   }
+  free_file_lines(file_lines);
   return result;
 }

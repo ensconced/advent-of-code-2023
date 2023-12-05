@@ -5,11 +5,25 @@
 #include <stdlib.h>
 #include <string.h>
 
+// void take_word(char **str_pointer) {
+//   size_t taken = 0;
+//   while (1) {
+//     char next_char = (*str_pointer)[taken];
+//     if (isalpha(next_char)) {
+//       taken++;
+//     } else {
+//       break;
+//     }
+//   }
+//   *str_pointer += taken;
+//   return !!taken;
+// }
+
 bool maybe_take_whitespace(char **str_pointer) {
   size_t taken = 0;
   while (1) {
     char next_char = (*str_pointer)[taken];
-    if (next_char == ' ' || next_char == '\t') {
+    if (isblank(next_char)) {
       taken++;
     } else {
       break;
@@ -19,16 +33,16 @@ bool maybe_take_whitespace(char **str_pointer) {
   return !!taken;
 }
 
-void take_word(char *word, char **str_pointer) {
+void take_string(char *word, char **str_pointer) {
   size_t word_len = strlen(word);
   if (strncmp(*str_pointer, word, word_len)) {
     printf("expected word \"%s\" to start with \"%s\"\n", *str_pointer, word);
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   *str_pointer += word_len;
 }
 
-bool maybe_take_word(char *word, char **str_pointer) {
+bool maybe_take_string(char *word, char **str_pointer) {
   size_t word_len = strlen(word);
   if (strncmp(*str_pointer, word, word_len) == 0) {
     *str_pointer += word_len;
@@ -37,7 +51,7 @@ bool maybe_take_word(char *word, char **str_pointer) {
   return false;
 }
 
-void take_natural_number(char **str_pointer, char *result_buffer,
+void take_numeric_string(char **str_pointer, char *result_buffer,
                          size_t result_buffer_capacity) {
   size_t result_len = 0;
   size_t i;
@@ -46,7 +60,7 @@ void take_natural_number(char **str_pointer, char *result_buffer,
     if (isdigit(possible_digit)) {
       if (i >= result_buffer_capacity - 1) {
         printf("ran out of space in result buffer\n");
-        exit(1);
+        exit(EXIT_FAILURE);
       }
       result_buffer[i] = possible_digit;
       result_len++;
@@ -56,24 +70,24 @@ void take_natural_number(char **str_pointer, char *result_buffer,
   }
   if (result_len == 0) {
     printf("failed to take natural number\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   result_buffer[i] = '\0';
   (*str_pointer) += result_len;
 }
 
-void maybe_take_natural_number(char **str_pointer, char *result_buffer,
+void maybe_take_numeric_string(char **str_pointer, char *result_buffer,
                                size_t result_buffer_capacity) {
   char first_digit = (*str_pointer)[0];
-  if (isdigit(first_digit) && first_digit != '0') {
-    take_natural_number(str_pointer, result_buffer, result_buffer_capacity);
+  if (isdigit(first_digit)) {
+    take_numeric_string(str_pointer, result_buffer, result_buffer_capacity);
   } else {
     result_buffer[0] = '\0';
   }
 }
 
-void take_whitespace_separated_natural_numbers(char **str_pointer,
+void take_whitespace_separated_numeric_strings(char **str_pointer,
                                                char **result_buffer,
                                                size_t *result_buffer_len,
                                                size_t result_buffer_capacity,
@@ -82,17 +96,17 @@ void take_whitespace_separated_natural_numbers(char **str_pointer,
   *result_buffer_len = 0;
   while (1) {
     char *number_buffer = malloc(number_buffer_capacity);
-    if (number_buffer == NULL) {
+    if (number_buffer == 0) {
       printf("failed to allocate number buffer\n");
-      exit(1);
+      exit(EXIT_FAILURE);
     }
-    maybe_take_natural_number(str_pointer, number_buffer,
+    maybe_take_numeric_string(str_pointer, number_buffer,
                               number_buffer_capacity);
     maybe_take_whitespace(str_pointer);
     if (strlen(number_buffer)) {
       if ((*result_buffer_len) > result_buffer_capacity - 1) {
         printf("ran out of space in result buffer\n");
-        exit(1);
+        exit(EXIT_FAILURE);
       } else {
         result_buffer[(*result_buffer_len)++] = number_buffer;
       }
@@ -101,4 +115,23 @@ void take_whitespace_separated_natural_numbers(char **str_pointer,
       return;
     }
   }
+}
+
+void take_whitespace_separated_numbers(char **str_pointer, int *result_buffer,
+                                       size_t *result_buffer_len,
+                                       size_t result_buffer_capacity,
+                                       size_t number_buffer_capacity) {
+  char **string_array_buffer = malloc(result_buffer_capacity * sizeof(char *));
+  if (string_array_buffer == 0) {
+    printf("failed to allocate string array buffer\n");
+    exit(EXIT_FAILURE);
+  }
+  take_whitespace_separated_numeric_strings(
+      str_pointer, string_array_buffer, result_buffer_len,
+      result_buffer_capacity, number_buffer_capacity);
+
+  for (size_t i = 0; i < *result_buffer_len; ++i) {
+    result_buffer[i] = atoi(string_array_buffer[i]);
+  }
+  free(string_array_buffer);
 }

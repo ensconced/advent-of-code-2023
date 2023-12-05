@@ -10,24 +10,24 @@
 #include <string.h>
 
 int take_header_returning_game_id(char **str_pointer) {
-  take_word("Game ", str_pointer);
+  take_string("Game ", str_pointer);
   static const size_t number_buffer_capacity = 16;
   char number_buffer[number_buffer_capacity];
-  take_natural_number(str_pointer, number_buffer, 16);
+  take_numeric_string(str_pointer, number_buffer, 16);
   int game_id = atoi(number_buffer);
-  take_word(": ", str_pointer);
+  take_string(": ", str_pointer);
   return game_id;
 }
 
 enum Colour take_colour(char **str_pointer) {
-  if (maybe_take_word("red", str_pointer))
+  if (maybe_take_string("red", str_pointer))
     return RED;
-  if (maybe_take_word("blue", str_pointer))
+  if (maybe_take_string("blue", str_pointer))
     return BLUE;
-  if (maybe_take_word("green", str_pointer))
+  if (maybe_take_string("green", str_pointer))
     return GREEN;
   printf("expected colour\n");
-  exit(1);
+  exit(EXIT_FAILURE);
 }
 
 Round *maybe_take_round(char **str_pointer) {
@@ -39,11 +39,11 @@ Round *maybe_take_round(char **str_pointer) {
   do {
     static const size_t num_buffer_capacity = 16;
     char number_buffer[num_buffer_capacity];
-    maybe_take_natural_number(str_pointer, number_buffer, num_buffer_capacity);
+    maybe_take_numeric_string(str_pointer, number_buffer, num_buffer_capacity);
     draw_count = atoi(number_buffer);
 
     if (draw_count) {
-      take_word(" ", str_pointer);
+      take_string(" ", str_pointer);
       enum Colour colour = take_colour(str_pointer);
       if (colour == RED) {
         red_draw_count = draw_count;
@@ -56,18 +56,18 @@ Round *maybe_take_round(char **str_pointer) {
       char next_char = (*str_pointer)[0];
 
       if (next_char == '\0' || next_char == '\n' ||
-          maybe_take_word("; ", str_pointer)) {
+          maybe_take_string("; ", str_pointer)) {
         break;
       }
-      take_word(", ", str_pointer);
+      take_string(", ", str_pointer);
     }
   } while (draw_count);
 
   if (draw_count) {
     Round *round = calloc(1, sizeof(Round));
-    if (round == NULL) {
+    if (round == 0) {
       printf("failed to allocate round\n");
-      exit(1);
+      exit(EXIT_FAILURE);
     }
     round->red = red_draw_count;
     round->green = green_draw_count;
@@ -75,16 +75,16 @@ Round *maybe_take_round(char **str_pointer) {
     return round;
   }
 
-  return NULL;
+  return 0;
 }
 
 Round **take_rounds(size_t *round_count_result, char **str_pointer) {
   size_t rounds_capacity = 256;
   size_t round_count = 0;
   Round **rounds = malloc(rounds_capacity * sizeof(Round *));
-  if (rounds == NULL) {
+  if (rounds == 0) {
     printf("failed to allocate rounds\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   Round *round;
   do {
@@ -92,12 +92,12 @@ Round **take_rounds(size_t *round_count_result, char **str_pointer) {
     if (round) {
       if (round_count == rounds_capacity) {
         printf("too many rounds\n");
-        exit(1);
+        exit(EXIT_FAILURE);
       }
       rounds[round_count++] = round;
     }
 
-  } while (round != NULL);
+  } while (round != 0);
   *round_count_result = round_count;
   return rounds;
 }
@@ -154,6 +154,7 @@ int sum_possible_game_ids(char *input_path) {
       result += game.id;
     }
   }
+  free_file_lines(game_lines);
   return result;
 }
 
@@ -164,5 +165,6 @@ int sum_game_powers(char *input_path) {
     Game game = parse_line(game_lines.lines[i]);
     result += game_power(game);
   }
+  free_file_lines(game_lines);
   return result;
 }

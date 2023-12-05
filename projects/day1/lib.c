@@ -52,5 +52,6 @@ int sum_calibration_values(char *input_path, bool part2) {
   for (size_t i = 0; i < file_lines.line_count; ++i) {
     sum += line_value(file_lines.lines[i], part2);
   }
+  free_file_lines(file_lines);
   return sum;
 }

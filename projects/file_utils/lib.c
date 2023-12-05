@@ -1,3 +1,4 @@
+#include "./lib.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -5,61 +6,56 @@ long get_file_size(FILE *file) {
   long originalPosition = ftell(file);
   if (fseek(file, 0, SEEK_END) != 0) {
     printf("failed to seek to end of file\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   long result = ftell(file);
 
   if (fseek(file, originalPosition, SEEK_SET) != 0) {
     printf("failed to seek to original position of file\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   return result;
 }
 
 char *read_text_file(char *path) {
   FILE *file = fopen(path, "rt");
-  if (file == NULL) {
+  if (file == 0) {
     printf("file could not be opened\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   unsigned long fileSize = (unsigned long)get_file_size(file);
   char *buffer = malloc(fileSize + 1);
-  if (buffer == NULL) {
+  if (buffer == 0) {
     printf("failed to allocate\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   size_t readChars = fread(buffer, 1, fileSize, file);
   if (readChars != fileSize) {
     printf("didn't read as many chars as expected\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
   buffer[fileSize] = '\0';
 
   if (fclose(file) != 0) {
     printf("failed to close file\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   return buffer;
 }
 
-typedef struct FileLines {
-  char **lines;
-  size_t line_count;
-} FileLines;
-
 size_t initial_lines_capacity = 2;
 
 FileLines read_file_lines(char *path) {
   FILE *file = fopen(path, "rt");
-  if (file == NULL) {
+  if (file == 0) {
     printf("file could not be opened\n");
-    exit(1);
+    exit(EXIT_FAILURE);
   }
 
   char **lines = malloc(initial_lines_capacity * sizeof(char *));
-  if (lines == NULL) {
+  if (lines == 0) {
     printf("failed initial allocation of lines\n");
   }
 
@@ -79,7 +75,7 @@ FileLines read_file_lines(char *path) {
     if (result == -1) {
       if (fclose(file) != 0) {
         printf("failed to close file\n");
-        exit(1);
+        exit(EXIT_FAILURE);
       }
       return (FileLines){.lines = lines, .line_count = lines_len};
     } else {
@@ -87,4 +83,11 @@ FileLines read_file_lines(char *path) {
       lines_len++;
     }
   }
+}
+
+void free_file_lines(FileLines file_lines) {
+  for (size_t i = 0; i < file_lines.line_count; ++i) {
+    free(file_lines.lines[i]);
+  }
+  free(file_lines.lines);
 }

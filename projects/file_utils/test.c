@@ -20,9 +20,8 @@ void test_read_file_lines(void) {
   assert(file_lines.line_count == expected_line_count);
   for (size_t i = 0; i < file_lines.line_count; ++i) {
     assert(strcmp(file_lines.lines[i], expected_lines[i]) == 0);
-    free(file_lines.lines[i]);
   }
-  free(file_lines.lines);
+  free_file_lines(file_lines);
 }
 
 int main(void) {
