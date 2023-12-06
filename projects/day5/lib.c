@@ -1,11 +1,15 @@
 #include "./lib.h"
 #include "../file_utils/lib.h"
+#include "../linked_list/lib.h"
 #include "../parser_utils/lib.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#define MAX(x, y) ((x) > (y) ? (x) : (y))
+#define MIN(x, y) ((x) < (y) ? (x) : (y))
 
 const size_t ranges_buffer_capacity = 64;
 const size_t range_map_buffer_capacity = 64;
@@ -140,46 +144,223 @@ unsigned long part1_lowest_location(Almanac almanac) {
   return min;
 }
 
-void split_path_buckets(PathBucket *path_buckets, size_t *path_buckets_len,
-                        Range range) {}
+void print_path_bucket(PathBucket *path_bucket) {
+  printf("path_bucket->seed_range_start: %lu\n", path_bucket->seed_range_start);
+  printf("path_bucket->seed_range_end: %lu\n", path_bucket->seed_range_end);
+  printf("path_bucket->current_range_start: %lu\n",
+         path_bucket->current_range_start);
+  printf("path_bucket->current_range_end: %lu\n",
+         path_bucket->current_range_end);
+  printf("\n");
+}
 
-void get_path_buckets(Almanac almanac) {
-  PathBucket *path_buckets =
-      malloc(path_buckets_buffer_capacity * sizeof(PathBucket));
-  if (path_buckets == 0) {
-    printf("failed to allocate path buckets buffer\n");
+void split_path_bucket(LinkedListNode *path_bucket_node, Range range) {
+  PathBucket *path_bucket = (PathBucket *)(path_bucket_node->data);
+  // there is always a shifted portion - we'll update the existing node to
+  // become this
+  unsigned long shifted_portion_start =
+      MAX(path_bucket->current_range_start, range.source_range_start);
+  unsigned long shifted_portion_end =
+      MIN(path_bucket->current_range_end,
+          range.source_range_start + range.range_len);
+
+  unsigned long seed_range_start_truncation =
+      shifted_portion_start - path_bucket->current_range_start;
+  unsigned long seed_range_end_truncation =
+      path_bucket->current_range_end - shifted_portion_end;
+
+  PathBucket *shifted_path_bucket = malloc(sizeof(PathBucket));
+  if (shifted_path_bucket == 0) {
+    printf("failed to allocate shifted path bucket\n");
     exit(EXIT_FAILURE);
   }
-  size_t path_buckets_len = 0;
+  LinkedListNode *shifted_path_bucket_node = malloc(sizeof(LinkedListNode));
+  if (shifted_path_bucket_node == 0) {
+    printf("failed to allocate linked list ndoe\n");
+    exit(EXIT_FAILURE);
+  }
 
-  PathBucket initial_path_bucket = {
+  signed long original_bucket_offset =
+      (signed long)(path_bucket->current_range_start) -
+      (signed long)(path_bucket->seed_range_start);
+
+  signed long range_offset = (signed long)range.dest_range_start -
+                             (signed long)range.source_range_start;
+
+  signed long new_offset = original_bucket_offset + range_offset;
+
+  unsigned long seed_range_start =
+      path_bucket->seed_range_start + seed_range_start_truncation;
+
+  unsigned long seed_range_end =
+      path_bucket->seed_range_end - seed_range_end_truncation;
+
+  *shifted_path_bucket = (PathBucket){
+      .seed_range_start = seed_range_start,
+      .seed_range_end = seed_range_end,
+      .current_range_start =
+          (unsigned long)((signed long)seed_range_start + new_offset),
+      .current_range_end =
+          (unsigned long)((signed long)seed_range_end + new_offset),
+  };
+
+  shifted_path_bucket_node->data = shifted_path_bucket;
+  insert_after(path_bucket_node, shifted_path_bucket_node);
+
+  if (range.source_range_start > path_bucket->current_range_start) {
+    PathBucket *unshifted_start_bucket = malloc(sizeof(PathBucket));
+    if (unshifted_start_bucket == 0) {
+      printf("failed to allocate unshifted start bucket\n");
+      exit(EXIT_FAILURE);
+    }
+    LinkedListNode *unshifted_start_bucket_node =
+        malloc(sizeof(LinkedListNode));
+    if (unshifted_start_bucket_node == 0) {
+      printf("failed to allocate linked list ndoe\n");
+      exit(EXIT_FAILURE);
+    }
+
+    unsigned long bucket_length =
+        range.source_range_start - path_bucket->current_range_start;
+
+    *unshifted_start_bucket = (PathBucket){
+        .seed_range_start = path_bucket->seed_range_start,
+        .seed_range_end = path_bucket->seed_range_start + bucket_length,
+        .current_range_start = path_bucket->current_range_start,
+        .current_range_end = path_bucket->current_range_start + bucket_length,
+    };
+
+    unshifted_start_bucket_node->data = unshifted_start_bucket;
+    insert_after(path_bucket_node, unshifted_start_bucket_node);
+  }
+  if (range.source_range_start + range.range_len <
+      path_bucket->current_range_end) {
+    PathBucket *unshifted_end_bucket = malloc(sizeof(PathBucket));
+    if (unshifted_end_bucket == 0) {
+      printf("failed to allocate unshifted end bucket\n");
+      exit(EXIT_FAILURE);
+    }
+    LinkedListNode *unshifted_end_bucket_node = malloc(sizeof(LinkedListNode));
+    if (unshifted_end_bucket_node == 0) {
+      printf("failed to allocate linked list ndoe\n");
+      exit(EXIT_FAILURE);
+    }
+
+    unsigned long bucket_length = path_bucket->current_range_end -
+                                  (range.source_range_start + range.range_len);
+
+    *unshifted_end_bucket = (PathBucket){
+        .seed_range_start = path_bucket->seed_range_end - bucket_length,
+        .seed_range_end = path_bucket->seed_range_end,
+        .current_range_start = path_bucket->current_range_end - bucket_length,
+        .current_range_end = path_bucket->current_range_end,
+    };
+
+    unshifted_end_bucket_node->data = unshifted_end_bucket;
+    insert_after(path_bucket_node, unshifted_end_bucket_node);
+  }
+
+  remove_node(path_bucket_node);
+}
+
+void update_or_split_path_bucket(LinkedListNode *path_bucket_node,
+                                 Range range) {
+  PathBucket *path_bucket = (PathBucket *)(path_bucket_node->data);
+  bool range_covers_bucket =
+      range.source_range_start <= path_bucket->current_range_start &&
+      (range.source_range_start + range.range_len) >=
+          path_bucket->current_range_end;
+
+  if (range_covers_bucket) {
+    unsigned long offset = range.dest_range_start - range.source_range_start;
+    path_bucket->current_range_start += offset;
+    path_bucket->current_range_end += offset;
+  } else {
+    bool range_start_is_within_bucket =
+        range.source_range_start >= path_bucket->current_range_start &&
+        range.source_range_start < path_bucket->current_range_end;
+    bool range_end_is_within_bucket =
+        (range.source_range_start + range.range_len) >
+            path_bucket->current_range_start &&
+        (range.source_range_start + range.range_len) <=
+            path_bucket->current_range_end;
+
+    bool range_overlaps_bucket =
+        range_start_is_within_bucket || range_end_is_within_bucket;
+    if (range_overlaps_bucket) {
+      split_path_bucket(path_bucket_node, range);
+    }
+  }
+}
+
+void update_or_split_path_buckets(LinkedListNode *path_bucket_list_head,
+                                  Range range) {
+  LinkedListNode *current_path_bucket = path_bucket_list_head;
+  while (current_path_bucket) {
+    update_or_split_path_bucket(current_path_bucket, range);
+    current_path_bucket = current_path_bucket->next;
+  }
+}
+
+LinkedListNode *get_path_buckets(Almanac almanac) {
+  PathBucket *initial_path_bucket = malloc(sizeof(PathBucket));
+  if (initial_path_bucket == 0) {
+    printf("failed to allocate initial path bucket\n");
+    exit(EXIT_FAILURE);
+  }
+
+  *initial_path_bucket = (PathBucket){
       .seed_range_start = 0,
       .seed_range_end = ULONG_MAX,
       .current_range_start = 0,
       .current_range_end = ULONG_MAX,
   };
 
-  path_buckets[path_buckets_len++] = initial_path_bucket;
+  LinkedListNode *path_bucket_list_head = malloc(sizeof(LinkedListNode));
+  if (path_bucket_list_head == 0) {
+    printf("failed to allocate initial path bucket list head\n");
+    exit(EXIT_FAILURE);
+  }
+
+  *path_bucket_list_head = (LinkedListNode){.data = initial_path_bucket};
 
   for (size_t i = 0; i < almanac.range_maps_len; ++i) {
     for (size_t j = 0; j < almanac.range_maps[i].ranges_len; ++j) {
-      split_path_buckets(path_buckets, &path_buckets_len,
-                         almanac.range_maps[i].ranges[j]);
+      update_or_split_path_buckets(path_bucket_list_head,
+                                   almanac.range_maps[i].ranges[j]);
     }
   }
+  return path_bucket_list_head;
 }
 
 unsigned long part2_lowest_location(Almanac almanac) {
+  LinkedListNode *path_bucket_list_head = get_path_buckets(almanac);
   unsigned long min = ULONG_MAX;
   for (size_t i = 0; i < almanac.seeds_len; i += 2) {
     unsigned long seed_range_start = almanac.seeds[i];
     unsigned long seed_range_len = almanac.seeds[i + 1];
-    for (unsigned long seed = seed_range_start;
-         seed < seed_range_start + seed_range_len; ++seed) {
-      unsigned long location = map_seed_to_location(seed, almanac);
-      if (location < min) {
-        min = location;
+    unsigned long seed_range_end = seed_range_start + seed_range_len;
+
+    LinkedListNode *current_node = path_bucket_list_head;
+    while (current_node) {
+      PathBucket *current_bucket = (PathBucket *)(current_node->data);
+      print_path_bucket(current_bucket);
+      signed long bucket_offset =
+          (signed long)(current_bucket->current_range_start) -
+          (signed long)(current_bucket->seed_range_start);
+
+      unsigned long best_result_for_bucket = ULONG_MAX;
+      if (seed_range_start <= current_bucket->seed_range_start &&
+          seed_range_end > current_bucket->seed_range_start) {
+        best_result_for_bucket = current_bucket->current_range_start;
+      } else if (seed_range_start >= current_bucket->current_range_start &&
+                 seed_range_start < seed_range_end) {
+        best_result_for_bucket =
+            (unsigned long)((signed long)seed_range_start + bucket_offset);
       }
+      min = MIN(min, best_result_for_bucket);
+
+      current_node = current_node->next;
     }
   }
   return min;
