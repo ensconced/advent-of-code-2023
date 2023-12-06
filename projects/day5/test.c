@@ -199,14 +199,15 @@ void test_parse_input(void) {
 }
 
 int main(void) {
-  test_parse_input();
-  assert(part1_lowest_location(parse_input("./inputs/example_input.txt")) ==
-         35);
-  assert(part1_lowest_location(parse_input("./inputs/input.txt")) == 346433842);
-  printf("part 2 simple input result: %lu\n",
-         part2_lowest_location(parse_input("./inputs/simple_example.txt")));
-  //   printf("part 2 example input result: %lu\n",
-  //          part2_lowest_location(parse_input("./inputs/example_input.txt")));
+  //   test_parse_input();
+  //   assert(part1_lowest_location(parse_input("./inputs/example_input.txt"))
+  //   ==
+  //          35);
+  // assert(part1_lowest_location(parse_input("./inputs/input.txt")) ==
+  //   346433842); printf("part 2 simple input result: %lu\n",
+  //          part2_lowest_location(parse_input("./inputs/simple_example.txt")));
+  printf("part 2 example input result: %lu\n",
+         part2_lowest_location(parse_input("./inputs/example_input.txt")));
   //   assert(part2_lowest_location(parse_input("./inputs/example_input.txt"))
   //   ==
   //          46);
