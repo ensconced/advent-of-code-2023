@@ -1,3 +1,4 @@
+#pragma once
 #include <stddef.h>
 
 char *read_text_file(char *path);
