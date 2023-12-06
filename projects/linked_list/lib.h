@@ -1,3 +1,5 @@
+#include <stddef.h>
+
 typedef struct LinkedListNode LinkedListNode;
 struct LinkedListNode {
   void *data;
@@ -5,7 +7,12 @@ struct LinkedListNode {
   LinkedListNode *next;
 };
 
-LinkedListNode *find_tail(LinkedListNode *list_head);
-void append(LinkedListNode *list_head, LinkedListNode *new_tail);
-void remove_node(LinkedListNode *node);
-void insert_after(LinkedListNode *reference_node, LinkedListNode *new_node);
+typedef struct {
+  LinkedListNode *head;
+} LinkedList;
+
+LinkedListNode *find_tail(LinkedList *list);
+void append(LinkedList *list, LinkedListNode *new_tail);
+void remove_node(LinkedList *list, LinkedListNode *node);
+void add_at_head(LinkedList *list, LinkedListNode *new_node);
+size_t length(LinkedList *list);
