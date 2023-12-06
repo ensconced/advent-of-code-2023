@@ -1,3 +1,5 @@
+#pragma once
+#include "../utils/interval_utils/lib.h"
 #include <stddef.h>
 
 typedef struct {
@@ -19,11 +21,9 @@ typedef struct {
 } Almanac;
 
 typedef struct {
-  unsigned long seed_range_start;
-  unsigned long seed_range_end;
-  unsigned long current_range_start;
-  unsigned long current_range_end;
-} PathBucket;
+  Interval original_interval;
+  Interval current_interval;
+} MappedInterval;
 
 Almanac parse_input(char *input_path);
 unsigned long part1_lowest_location(Almanac almanac);
