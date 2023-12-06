@@ -36,6 +36,13 @@ void test_take_numeric_string(void) {
   assert(strcmp(str2, " hello there") == 0);
 }
 
+void test_take_number(void) {
+  char *str1 = "1234 hello there";
+  int result = take_number(&str1);
+  assert(result == 1234);
+  assert(strcmp(str1, " hello there") == 0);
+}
+
 void test_maybe_take_numeric_string(void) {
   char *str1 = "foo bar 1234";
   static const size_t number_buffer_capacity = 16;
@@ -113,6 +120,7 @@ int main(void) {
   test_take_string();
   test_maybe_take_string();
   test_take_numeric_string();
+  test_take_number();
   test_maybe_take_numeric_string();
   test_maybe_take_whitespace();
   test_take_whitespace_separated_numeric_strings();

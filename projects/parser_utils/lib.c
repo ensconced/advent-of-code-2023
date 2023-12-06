@@ -5,20 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// void take_word(char **str_pointer) {
-//   size_t taken = 0;
-//   while (1) {
-//     char next_char = (*str_pointer)[taken];
-//     if (isalpha(next_char)) {
-//       taken++;
-//     } else {
-//       break;
-//     }
-//   }
-//   *str_pointer += taken;
-//   return !!taken;
-// }
-
 bool maybe_take_whitespace(char **str_pointer) {
   size_t taken = 0;
   while (1) {
@@ -85,6 +71,13 @@ void maybe_take_numeric_string(char **str_pointer, char *result_buffer,
   } else {
     result_buffer[0] = '\0';
   }
+}
+
+int take_number(char **str_pointer) {
+  static const size_t buffer_capacity = 32;
+  char buffer[buffer_capacity];
+  take_numeric_string(str_pointer, buffer, buffer_capacity);
+  return atoi(buffer);
 }
 
 void take_whitespace_separated_numeric_strings(char **str_pointer,
