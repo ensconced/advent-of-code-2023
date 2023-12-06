@@ -1,0 +1,46 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     'bin/test'
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _get_file_size, symObjAddr: 0x0, symBinAddr: 0x100000DFC, symSize: 0xAC }
+  - { offsetInCU: 0x49, offset: 0x49, size: 0x8, addend: 0x0, symName: _.str.2, symObjAddr: 0x860, symBinAddr: 0x100002DE0, symSize: 0x0 }
+  - { offsetInCU: 0x6A, offset: 0x6A, size: 0x8, addend: 0x0, symName: _initial_lines_capacity, symObjAddr: 0x7C0, symBinAddr: 0x100008080, symSize: 0x0 }
+  - { offsetInCU: 0x85, offset: 0x85, size: 0x8, addend: 0x0, symName: _get_file_size, symObjAddr: 0x0, symBinAddr: 0x100000DFC, symSize: 0xAC }
+  - { offsetInCU: 0x361, offset: 0x361, size: 0x8, addend: 0x0, symName: _read_text_file, symObjAddr: 0xAC, symBinAddr: 0x100000EA8, symSize: 0x160 }
+  - { offsetInCU: 0x3F8, offset: 0x3F8, size: 0x8, addend: 0x0, symName: _read_file_lines, symObjAddr: 0x20C, symBinAddr: 0x100001008, symSize: 0x36C }
+  - { offsetInCU: 0x50F, offset: 0x50F, size: 0x8, addend: 0x0, symName: _free_file_lines, symObjAddr: 0x578, symBinAddr: 0x100001374, symSize: 0xE4 }
+  - { offsetInCU: 0x26, offset: 0x59B, size: 0x8, addend: 0x0, symName: _test_read_text_file, symObjAddr: 0x0, symBinAddr: 0x1000014D4, symSize: 0x70 }
+  - { offsetInCU: 0x3B, offset: 0x5B0, size: 0x8, addend: 0x0, symName: _.str, symObjAddr: 0x4A0, symBinAddr: 0x1000030A0, symSize: 0x0 }
+  - { offsetInCU: 0x66, offset: 0x5DB, size: 0x8, addend: 0x0, symName: _.str.1, symObjAddr: 0x4C0, symBinAddr: 0x1000030C0, symSize: 0x0 }
+  - { offsetInCU: 0x83, offset: 0x5F8, size: 0x8, addend: 0x0, symName: ___func__.test_read_text_file, symObjAddr: 0x4E0, symBinAddr: 0x1000030E0, symSize: 0x0 }
+  - { offsetInCU: 0xA5, offset: 0x61A, size: 0x8, addend: 0x0, symName: _.str.2, symObjAddr: 0x520, symBinAddr: 0x100003120, symSize: 0x0 }
+  - { offsetInCU: 0xC2, offset: 0x637, size: 0x8, addend: 0x0, symName: _.str.3, symObjAddr: 0x540, symBinAddr: 0x100003140, symSize: 0x0 }
+  - { offsetInCU: 0xDF, offset: 0x654, size: 0x8, addend: 0x0, symName: _.str.4, symObjAddr: 0x5A0, symBinAddr: 0x1000031A0, symSize: 0x0 }
+  - { offsetInCU: 0xFC, offset: 0x671, size: 0x8, addend: 0x0, symName: _.str.5, symObjAddr: 0x5C0, symBinAddr: 0x1000031C0, symSize: 0x0 }
+  - { offsetInCU: 0x10D, offset: 0x682, size: 0x8, addend: 0x0, symName: _.str.6, symObjAddr: 0x5E0, symBinAddr: 0x1000031E0, symSize: 0x0 }
+  - { offsetInCU: 0x12A, offset: 0x69F, size: 0x8, addend: 0x0, symName: _.str.7, symObjAddr: 0x600, symBinAddr: 0x100003200, symSize: 0x0 }
+  - { offsetInCU: 0x13B, offset: 0x6B0, size: 0x8, addend: 0x0, symName: _.str.8, symObjAddr: 0x620, symBinAddr: 0x100003220, symSize: 0x0 }
+  - { offsetInCU: 0x14C, offset: 0x6C1, size: 0x8, addend: 0x0, symName: _.str.9, symObjAddr: 0x640, symBinAddr: 0x100003240, symSize: 0x0 }
+  - { offsetInCU: 0x15D, offset: 0x6D2, size: 0x8, addend: 0x0, symName: _.str.10, symObjAddr: 0x660, symBinAddr: 0x100003260, symSize: 0x0 }
+  - { offsetInCU: 0x17A, offset: 0x6EF, size: 0x8, addend: 0x0, symName: _.str.11, symObjAddr: 0x680, symBinAddr: 0x100003280, symSize: 0x0 }
+  - { offsetInCU: 0x18B, offset: 0x700, size: 0x8, addend: 0x0, symName: _.str.12, symObjAddr: 0x6A0, symBinAddr: 0x1000032A0, symSize: 0x0 }
+  - { offsetInCU: 0x19C, offset: 0x711, size: 0x8, addend: 0x0, symName: _.str.13, symObjAddr: 0x6C0, symBinAddr: 0x1000032C0, symSize: 0x0 }
+  - { offsetInCU: 0x1AD, offset: 0x722, size: 0x8, addend: 0x0, symName: _.str.14, symObjAddr: 0x6E0, symBinAddr: 0x1000032E0, symSize: 0x0 }
+  - { offsetInCU: 0x1BE, offset: 0x733, size: 0x8, addend: 0x0, symName: _.str.15, symObjAddr: 0x700, symBinAddr: 0x100003300, symSize: 0x0 }
+  - { offsetInCU: 0x1DB, offset: 0x750, size: 0x8, addend: 0x0, symName: ___func__.test_read_file_lines, symObjAddr: 0x740, symBinAddr: 0x100003340, symSize: 0x0 }
+  - { offsetInCU: 0x1F8, offset: 0x76D, size: 0x8, addend: 0x0, symName: _.str.16, symObjAddr: 0x780, symBinAddr: 0x100003380, symSize: 0x0 }
+  - { offsetInCU: 0x209, offset: 0x77E, size: 0x8, addend: 0x0, symName: _.str.17, symObjAddr: 0x7E0, symBinAddr: 0x1000033E0, symSize: 0x0 }
+  - { offsetInCU: 0x21E, offset: 0x793, size: 0x8, addend: 0x0, symName: _test_read_text_file, symObjAddr: 0x0, symBinAddr: 0x1000014D4, symSize: 0x70 }
+  - { offsetInCU: 0x267, offset: 0x7DC, size: 0x8, addend: 0x0, symName: _test_read_file_lines, symObjAddr: 0x70, symBinAddr: 0x100001544, symSize: 0x330 }
+  - { offsetInCU: 0x36A, offset: 0x8DF, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x3A0, symBinAddr: 0x100001874, symSize: 0x7C }
+  - { offsetInCU: 0x26, offset: 0x96B, size: 0x8, addend: 0x0, symName: _maybe_take_whitespace, symObjAddr: 0x0, symBinAddr: 0x10000196C, symSize: 0x280 }
+  - { offsetInCU: 0x3B, offset: 0x980, size: 0x8, addend: 0x0, symName: _.str, symObjAddr: 0x15A0, symBinAddr: 0x100003440, symSize: 0x0 }
+  - { offsetInCU: 0x5E, offset: 0x9A3, size: 0x8, addend: 0x0, symName: _take_number, symObjAddr: 0xAB0, symBinAddr: 0x10000241C, symSize: 0x148 }
+  - { offsetInCU: 0x132, offset: 0xA77, size: 0x8, addend: 0x0, symName: _maybe_take_whitespace, symObjAddr: 0x0, symBinAddr: 0x10000196C, symSize: 0x280 }
+  - { offsetInCU: 0x1B0, offset: 0xAF5, size: 0x8, addend: 0x0, symName: _take_string, symObjAddr: 0x280, symBinAddr: 0x100001BEC, symSize: 0x170 }
+  - { offsetInCU: 0x1F3, offset: 0xB38, size: 0x8, addend: 0x0, symName: _maybe_take_string, symObjAddr: 0x3F0, symBinAddr: 0x100001D5C, symSize: 0x128 }
+  - { offsetInCU: 0x23A, offset: 0xB7F, size: 0x8, addend: 0x0, symName: _take_numeric_string, symObjAddr: 0x518, symBinAddr: 0x100001E84, symSize: 0x43C }
+  - { offsetInCU: 0x2B0, offset: 0xBF5, size: 0x8, addend: 0x0, symName: _maybe_take_numeric_string, symObjAddr: 0x954, symBinAddr: 0x1000022C0, symSize: 0x15C }
+  - { offsetInCU: 0x30B, offset: 0xC50, size: 0x8, addend: 0x0, symName: _take_whitespace_separated_numeric_strings, symObjAddr: 0xBF8, symBinAddr: 0x100002564, symSize: 0x238 }
+  - { offsetInCU: 0x3B5, offset: 0xCFA, size: 0x8, addend: 0x0, symName: _take_whitespace_separated_numbers, symObjAddr: 0xE30, symBinAddr: 0x10000279C, symSize: 0x224 }
+...
