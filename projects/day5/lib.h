@@ -19,4 +19,5 @@ typedef struct {
 } Almanac;
 
 Almanac parse_input(char *input_path);
-unsigned long lowest_location(Almanac almanac);
+unsigned long part1_lowest_location(Almanac almanac);
+unsigned long part2_lowest_location(Almanac almanac);

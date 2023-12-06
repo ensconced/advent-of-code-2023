@@ -128,12 +128,28 @@ unsigned long map_seed_to_location(unsigned long seed, Almanac almanac) {
   return current_value;
 }
 
-unsigned long lowest_location(Almanac almanac) {
+unsigned long part1_lowest_location(Almanac almanac) {
   unsigned long min = ULONG_MAX;
   for (size_t i = 0; i < almanac.seeds_len; ++i) {
     unsigned long location = map_seed_to_location(almanac.seeds[i], almanac);
     if (location < min) {
       min = location;
+    }
+  }
+  return min;
+}
+
+unsigned long part2_lowest_location(Almanac almanac) {
+  unsigned long min = ULONG_MAX;
+  for (size_t i = 0; i < almanac.seeds_len; i += 2) {
+    unsigned long seed_range_start = almanac.seeds[i];
+    unsigned long seed_range_len = almanac.seeds[i + 1];
+    for (unsigned long seed = seed_range_start;
+         seed < seed_range_start + seed_range_len; ++seed) {
+      unsigned long location = map_seed_to_location(seed, almanac);
+      if (location < min) {
+        min = location;
+      }
     }
   }
   return min;
