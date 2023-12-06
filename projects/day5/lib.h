@@ -1,9 +1,9 @@
 #include <stddef.h>
 
 typedef struct {
-  int dest_range_start;
-  int source_range_start;
-  int range_len;
+  unsigned long dest_range_start;
+  unsigned long source_range_start;
+  unsigned long range_len;
 } Range;
 
 typedef struct {
@@ -12,10 +12,11 @@ typedef struct {
 } RangeMap;
 
 typedef struct {
-  int *seeds;
+  unsigned long *seeds;
   size_t seeds_len;
   RangeMap *range_maps;
   size_t range_maps_len;
 } Almanac;
 
 Almanac parse_input(char *input_path);
+unsigned long lowest_location(Almanac almanac);

@@ -185,7 +185,7 @@ void test_parse_input(void) {
       expected_humidity_to_location_range_map,
   };
 
-  int expected_seeds[expected_seeds_len] = {79, 14, 55, 13};
+  unsigned long expected_seeds[expected_seeds_len] = {79, 14, 55, 13};
 
   Almanac expected_almanac = {
       .seeds = expected_seeds,
@@ -198,4 +198,8 @@ void test_parse_input(void) {
   assert_almanacs_are_equal(almanac, expected_almanac);
 }
 
-int main(void) { test_parse_input(); }
+int main(void) {
+  test_parse_input();
+  assert(lowest_location(parse_input("./inputs/example_input.txt")) == 35);
+  assert(lowest_location(parse_input("./inputs/input.txt")) == 346433842);
+}

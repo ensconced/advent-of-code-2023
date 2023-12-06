@@ -38,7 +38,7 @@ void test_take_numeric_string(void) {
 
 void test_take_number(void) {
   char *str1 = "1234 hello there";
-  int result = take_number(&str1);
+  unsigned long result = take_number(&str1);
   assert(result == 1234);
   assert(strcmp(str1, " hello there") == 0);
 }
@@ -102,14 +102,14 @@ void test_take_whitespace_separated_numbers(void) {
   char *str = "123  456  789";
   static const size_t result_buffer_capacity = 4;
   static const size_t individual_number_buffer_capacity = 8;
-  int result_buffer[result_buffer_capacity];
+  unsigned long result_buffer[result_buffer_capacity];
   size_t result_buffer_len;
   take_whitespace_separated_numbers(&str, result_buffer, &result_buffer_len,
                                     result_buffer_capacity,
                                     individual_number_buffer_capacity);
 
   static const size_t expected_len = 3;
-  int expected_result[expected_len] = {123, 456, 789};
+  unsigned long expected_result[expected_len] = {123, 456, 789};
   assert(result_buffer_len == expected_len);
   for (size_t i = 0; i < expected_len; ++i) {
     assert(result_buffer[i] == expected_result[i]);
