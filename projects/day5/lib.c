@@ -1,7 +1,7 @@
 #include "./lib.h"
-#include "../file_utils/lib.h"
-#include "../linked_list/lib.h"
-#include "../parser_utils/lib.h"
+#include "../utils/file_utils/lib.h"
+#include "../utils/linked_list/lib.h"
+#include "../utils/parser_utils/lib.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdbool.h>

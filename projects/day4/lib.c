@@ -1,6 +1,6 @@
 #include "./lib.h"
-#include "../file_utils/lib.h"
-#include "../parser_utils/lib.h"
+#include "../utils/file_utils/lib.h"
+#include "../utils/parser_utils/lib.h"
 #include <stdio.h>
 #include <stdlib.h>
 
