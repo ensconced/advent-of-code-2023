@@ -2,6 +2,8 @@
 #include "../file_utils/lib.h"
 #include "../parser_utils/lib.h"
 #include <ctype.h>
+#include <limits.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,7 +14,7 @@ const size_t seeds_buffer_capacity = 128;
 const size_t individual_number_buffer_capacity = 16;
 
 void take_seeds(FileLines file_lines, size_t *current_line_idx,
-                int *seeds_buffer, size_t *seeds_buffer_len) {
+                unsigned long *seeds_buffer, size_t *seeds_buffer_len) {
   char *line = file_lines.lines[*current_line_idx];
   char *current_position_within_line = line;
   take_string("seeds: ", &current_position_within_line);
@@ -24,11 +26,11 @@ void take_seeds(FileLines file_lines, size_t *current_line_idx,
 
 Range take_range(FileLines file_lines, size_t *current_line_idx) {
   char *line = file_lines.lines[(*current_line_idx)++];
-  int dest_range_start = take_number(&line);
+  unsigned long dest_range_start = take_number(&line);
   maybe_take_whitespace(&line);
-  int source_range_start = take_number(&line);
+  unsigned long source_range_start = take_number(&line);
   maybe_take_whitespace(&line);
-  int range_len = take_number(&line);
+  unsigned long range_len = take_number(&line);
   return (Range){
       .dest_range_start = dest_range_start,
       .source_range_start = source_range_start,
@@ -85,7 +87,7 @@ Almanac parse_input(char *input_path) {
   FileLines file_lines = read_file_lines(input_path);
   size_t current_line_idx = 0;
 
-  int *seeds = malloc(seeds_buffer_capacity * sizeof(int));
+  unsigned long *seeds = malloc(seeds_buffer_capacity * sizeof(unsigned long));
   size_t seeds_len;
   take_seeds(file_lines, &current_line_idx, seeds, &seeds_len);
 
@@ -97,4 +99,42 @@ Almanac parse_input(char *input_path) {
                    .seeds_len = seeds_len,
                    .range_maps = range_maps,
                    .range_maps_len = range_maps_len};
+}
+
+bool find_matching_range(RangeMap range_map, unsigned long value,
+                         Range *result) {
+  for (size_t i = 0; i < range_map.ranges_len; ++i) {
+    Range range = range_map.ranges[i];
+    if (value >= range.source_range_start &&
+        value < range.source_range_start + range.range_len) {
+      *result = range;
+      return true;
+    }
+  }
+  return false;
+}
+
+unsigned long map_seed_to_location(unsigned long seed, Almanac almanac) {
+  unsigned long current_value = seed;
+  for (size_t i = 0; i < almanac.range_maps_len; ++i) {
+    RangeMap range_map = almanac.range_maps[i];
+    Range matching_range;
+    if (find_matching_range(range_map, current_value, &matching_range)) {
+      unsigned long offset_within_range =
+          current_value - matching_range.source_range_start;
+      current_value = matching_range.dest_range_start + offset_within_range;
+    }
+  }
+  return current_value;
+}
+
+unsigned long lowest_location(Almanac almanac) {
+  unsigned long min = ULONG_MAX;
+  for (size_t i = 0; i < almanac.seeds_len; ++i) {
+    unsigned long location = map_seed_to_location(almanac.seeds[i], almanac);
+    if (location < min) {
+      min = location;
+    }
+  }
+  return min;
 }

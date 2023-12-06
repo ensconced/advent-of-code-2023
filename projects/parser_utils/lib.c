@@ -73,11 +73,11 @@ void maybe_take_numeric_string(char **str_pointer, char *result_buffer,
   }
 }
 
-int take_number(char **str_pointer) {
+unsigned long take_number(char **str_pointer) {
   static const size_t buffer_capacity = 32;
   char buffer[buffer_capacity];
   take_numeric_string(str_pointer, buffer, buffer_capacity);
-  return atoi(buffer);
+  return strtoul(buffer, 0, 10);
 }
 
 void take_whitespace_separated_numeric_strings(char **str_pointer,
@@ -110,7 +110,8 @@ void take_whitespace_separated_numeric_strings(char **str_pointer,
   }
 }
 
-void take_whitespace_separated_numbers(char **str_pointer, int *result_buffer,
+void take_whitespace_separated_numbers(char **str_pointer,
+                                       unsigned long *result_buffer,
                                        size_t *result_buffer_len,
                                        size_t result_buffer_capacity,
                                        size_t number_buffer_capacity) {
@@ -124,7 +125,7 @@ void take_whitespace_separated_numbers(char **str_pointer, int *result_buffer,
       result_buffer_capacity, number_buffer_capacity);
 
   for (size_t i = 0; i < *result_buffer_len; ++i) {
-    result_buffer[i] = atoi(string_array_buffer[i]);
+    result_buffer[i] = strtoul(string_array_buffer[i], 0, 10);
   }
   free(string_array_buffer);
 }
