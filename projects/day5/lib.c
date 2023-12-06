@@ -12,6 +12,7 @@ const size_t range_map_buffer_capacity = 64;
 const size_t range_map_numbers_buffer_capacity = 64;
 const size_t seeds_buffer_capacity = 128;
 const size_t individual_number_buffer_capacity = 16;
+const size_t path_buckets_buffer_capacity = 512;
 
 void take_seeds(FileLines file_lines, size_t *current_line_idx,
                 unsigned long *seeds_buffer, size_t *seeds_buffer_len) {
@@ -137,6 +138,35 @@ unsigned long part1_lowest_location(Almanac almanac) {
     }
   }
   return min;
+}
+
+void split_path_buckets(PathBucket *path_buckets, size_t *path_buckets_len,
+                        Range range) {}
+
+void get_path_buckets(Almanac almanac) {
+  PathBucket *path_buckets =
+      malloc(path_buckets_buffer_capacity * sizeof(PathBucket));
+  if (path_buckets == 0) {
+    printf("failed to allocate path buckets buffer\n");
+    exit(EXIT_FAILURE);
+  }
+  size_t path_buckets_len = 0;
+
+  PathBucket initial_path_bucket = {
+      .seed_range_start = 0,
+      .seed_range_end = ULONG_MAX,
+      .current_range_start = 0,
+      .current_range_end = ULONG_MAX,
+  };
+
+  path_buckets[path_buckets_len++] = initial_path_bucket;
+
+  for (size_t i = 0; i < almanac.range_maps_len; ++i) {
+    for (size_t j = 0; j < almanac.range_maps[i].ranges_len; ++j) {
+      split_path_buckets(path_buckets, &path_buckets_len,
+                         almanac.range_maps[i].ranges[j]);
+    }
+  }
 }
 
 unsigned long part2_lowest_location(Almanac almanac) {
