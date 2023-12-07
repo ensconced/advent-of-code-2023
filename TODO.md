@@ -7,4 +7,7 @@ general
 
 day5
 
-- part2 solution is stupidly slow
+- add util function for interval maps, to substract an interval from the dst side, and return the
+  remaining interval map(s), using union akin to existing util for intervals
+- use this recursively on remaining parts of interval maps to make sure all parts are checked
+  against range maps
