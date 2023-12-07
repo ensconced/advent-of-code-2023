@@ -3,9 +3,9 @@
 #include <stddef.h>
 
 typedef struct {
-  unsigned long dest_range_start;
-  unsigned long source_range_start;
-  unsigned long range_len;
+  long dest_range_start;
+  long source_range_start;
+  long range_len;
 } Range;
 
 typedef struct {
@@ -21,10 +21,9 @@ typedef struct {
 } Almanac;
 
 typedef struct {
-  interval_Interval original_interval;
-  interval_Interval current_interval;
+  interval_interval seed_interval;
+  interval_interval current_interval;
 } MappedInterval;
 
-Almanac parse_input(char *input_path);
-unsigned long part1_lowest_location(Almanac almanac);
-unsigned long part2_lowest_location(Almanac almanac);
+long part1_lowest_location(Almanac almanac);
+long part2_lowest_location(Almanac almanac);

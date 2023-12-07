@@ -1,4 +1,5 @@
 #include "./lib.h"
+#include "./parser.h"
 #include <assert.h>
 #include <stdio.h>
 
@@ -203,11 +204,10 @@ int main(void) {
   //   assert(part1_lowest_location(parse_input("./inputs/example_input.txt"))
   //   ==
   //          35);
-  // assert(part1_lowest_location(parse_input("./inputs/input.txt")) ==
-  //   346433842); printf("part 2 simple input result: %lu\n",
-  //          part2_lowest_location(parse_input("./inputs/simple_example.txt")));
-  //   printf("part 2 example input result: %lu\n",
-  //          part2_lowest_location(parse_input("./inputs/example_input.txt")));
+  //   assert(part1_lowest_location(parse_input("./inputs/input.txt")) ==
+  //   346433842);
+  printf("part 2 example input result: %ld\n",
+         part2_lowest_location(parse_input("./inputs/example_input.txt")));
   //   assert(part2_lowest_location(parse_input("./inputs/example_input.txt"))
   //   ==
   //          46);
