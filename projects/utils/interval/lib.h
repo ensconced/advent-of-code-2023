@@ -29,3 +29,5 @@ interval_interval interval_intersection(interval_interval a,
                                         interval_interval b);
 interval_difference_result interval_difference(interval_interval a,
                                                interval_interval b);
+
+interval_interval interval_shift(interval_interval interval, long offset);
