@@ -71,8 +71,8 @@ bool find_intersecting_range(MappedInterval mapped_interval, RangeMap range_map,
                              Range *result) {
   for (size_t i = 0; i < range_map.ranges_len; ++i) {
     Range range = range_map.ranges[i];
-    // TODO - it would be easier to represent the ranges using intervals from
-    // the start (i.e. while parsing)
+    // TODO - it would be easier if we represented the ranges using intervals
+    // from the start (i.e. while parsing)
     interval_interval range_interval = {
         .start = (long)range.source_range_start,
         .end = (long)(range.source_range_start + range.range_len),
@@ -86,29 +86,29 @@ bool find_intersecting_range(MappedInterval mapped_interval, RangeMap range_map,
   return false;
 }
 
-void add_new_interval(interval_interval new_interval,
+void add_new_interval(interval_interval current_interval, long offset,
                       MappedInterval mapped_interval,
                       MappedInterval *mapped_intervals,
                       size_t *mapped_intervals_len) {
   long new_interval_offset =
-      new_interval.start - mapped_interval.current_interval.start;
-  long new_interval_length = new_interval.end - new_interval.start;
-
-  long original_interval_start =
+      current_interval.start - mapped_interval.current_interval.start;
+  long new_interval_length = current_interval.end - current_interval.start;
+  long seed_interval_start =
       mapped_interval.seed_interval.start + new_interval_offset;
 
-  interval_interval original_interval = {
-      .start = original_interval_start,
-      .end = original_interval_start + new_interval_length,
+  interval_interval seed_interval = {
+      .start = seed_interval_start,
+      .end = seed_interval_start + new_interval_length,
   };
 
   if (*mapped_intervals_len == mapped_intervals_capacity) {
     printf("mapped intervals buffer at capacity\n");
     exit(EXIT_FAILURE);
   }
+  interval_interval shifted_interval = interval_shift(current_interval, offset);
   mapped_intervals[(*mapped_intervals_len)++] = (MappedInterval){
-      .seed_interval = original_interval,
-      .current_interval = new_interval,
+      .seed_interval = seed_interval,
+      .current_interval = shifted_interval,
   };
 }
 
@@ -130,28 +130,32 @@ MappedInterval *apply_range_map(MappedInterval *mapped_intervals,
           .end = (long)(intersecting_range.source_range_start +
                         intersecting_range.range_len),
       };
+
+      long range_offset = intersecting_range.dest_range_start -
+                          intersecting_range.source_range_start;
+
       interval_interval intersection = interval_intersection(
           mapped_interval.current_interval, range_interval);
 
-      add_new_interval(intersection, mapped_interval, new_mapped_intervals,
-                       &new_mapped_intervals_len);
+      add_new_interval(intersection, range_offset, mapped_interval,
+                       new_mapped_intervals, &new_mapped_intervals_len);
 
       interval_difference_result difference =
           interval_difference(mapped_interval.current_interval, intersection);
 
       if (difference.type == INTERVAL_SINGLE) {
         if (!interval_is_empty(difference.data.single)) {
-          add_new_interval(difference.data.single, mapped_interval,
+          add_new_interval(difference.data.single, 0, mapped_interval,
                            new_mapped_intervals, &new_mapped_intervals_len);
         }
       } else if (difference.type == INTERVAL_PAIR) {
-        add_new_interval(difference.data.pair[0], mapped_interval,
+        add_new_interval(difference.data.pair[0], 0, mapped_interval,
                          new_mapped_intervals, &new_mapped_intervals_len);
-        add_new_interval(difference.data.pair[1], mapped_interval,
+        add_new_interval(difference.data.pair[1], 0, mapped_interval,
                          new_mapped_intervals, &new_mapped_intervals_len);
       }
     } else {
-      add_new_interval(mapped_interval.current_interval, mapped_interval,
+      add_new_interval(mapped_interval.current_interval, 0, mapped_interval,
                        new_mapped_intervals, &new_mapped_intervals_len);
     }
   }
@@ -169,9 +173,10 @@ MappedInterval *get_mapped_intervals(Almanac almanac,
 
   size_t new_mapped_intervals_len = 0;
   for (size_t i = 0; i < almanac.range_maps_len; ++i) {
+    RangeMap range_map = almanac.range_maps[i];
     MappedInterval *new_mapped_intervals =
-        apply_range_map(mapped_intervals, mapped_intervals_len,
-                        almanac.range_maps[i], &new_mapped_intervals_len);
+        apply_range_map(mapped_intervals, mapped_intervals_len, range_map,
+                        &new_mapped_intervals_len);
     mapped_intervals = new_mapped_intervals;
     mapped_intervals_len = new_mapped_intervals_len;
   }
