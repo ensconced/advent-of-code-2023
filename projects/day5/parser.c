@@ -22,24 +22,32 @@ void take_seeds(FileLines file_lines, size_t *current_line_idx,
   (*current_line_idx) += 2;
 }
 
-Range take_range(FileLines file_lines, size_t *current_line_idx) {
+IntervalMap take_range(FileLines file_lines, size_t *current_line_idx) {
   char *line = file_lines.lines[(*current_line_idx)++];
   long dest_range_start = (long)take_number(&line);
   maybe_take_whitespace(&line);
   long source_range_start = (long)take_number(&line);
   maybe_take_whitespace(&line);
   long range_len = (long)take_number(&line);
-  return (Range){
-      .dest_range_start = dest_range_start,
-      .source_range_start = source_range_start,
-      .range_len = range_len,
+  return (IntervalMap){
+      .src_interval =
+          (interval_interval){
+              .start = source_range_start,
+              .end = source_range_start + range_len,
+          },
+      .dst_interval =
+          (interval_interval){
+              .start = dest_range_start,
+              .end = dest_range_start + range_len,
+          },
   };
 }
 
 void take_range_map(FileLines file_lines, size_t *current_line_idx,
                     RangeMap *range_map_buffer, size_t *range_map_buffer_len) {
 
-  Range *ranges_buffer = malloc(ranges_buffer_capacity * sizeof(Range));
+  IntervalMap *ranges_buffer =
+      malloc(ranges_buffer_capacity * sizeof(IntervalMap));
   if (ranges_buffer == 0) {
     printf("failed to allocate ranges buffer\n");
     exit(1);
@@ -51,7 +59,7 @@ void take_range_map(FileLines file_lines, size_t *current_line_idx,
     if (*current_line_idx < file_lines.line_count) {
       char *line = file_lines.lines[*current_line_idx];
       if (isdigit(line[0])) {
-        Range range = take_range(file_lines, current_line_idx);
+        IntervalMap range = take_range(file_lines, current_line_idx);
         if (ranges_buffer_len == ranges_buffer_capacity) {
           printf("ranges buffer at capacity\n");
           exit(1);
@@ -68,8 +76,8 @@ void take_range_map(FileLines file_lines, size_t *current_line_idx,
     exit(EXIT_FAILURE);
   }
   range_map_buffer[(*range_map_buffer_len)++] = (RangeMap){
-      .ranges = ranges_buffer,
-      .ranges_len = ranges_buffer_len,
+      .interval_maps = ranges_buffer,
+      .interval_maps_len = ranges_buffer_len,
   };
 }
 
