@@ -1,6 +1,6 @@
 #include "./lib.h"
 #include "../utils/file_utils/lib.h"
-#include "../utils/interval_utils/lib.h"
+#include "../utils/interval/lib.h"
 #include "../utils/linked_list/lib.h"
 #include "../utils/parser_utils/lib.h"
 #include <ctype.h>
@@ -152,7 +152,7 @@ MappedInterval *initial_intervals(Almanac almanac,
     exit(EXIT_FAILURE);
   }
   for (size_t i = 0; i < almanac.seeds_len; i += 2) {
-    Interval interval = {
+    interval_Interval interval = {
         .start = (long)almanac.seeds[i],
         .end = (long)(almanac.seeds[i] + almanac.seeds[i + 1]),
     };
