@@ -10,13 +10,13 @@ void assert_almanacs_are_equal(Almanac a, Almanac b) {
     assert(a.seeds[i] == b.seeds[i]);
   }
   for (size_t i = 0; i < a.range_maps_len; ++i) {
-    assert(a.range_maps[i].ranges_len == b.range_maps[i].ranges_len);
-    for (size_t j = 0; j < a.range_maps[i].ranges_len; ++j) {
-      Range a_range = a.range_maps[i].ranges[j];
-      Range b_range = b.range_maps[i].ranges[j];
-      assert(a_range.dest_range_start == b_range.dest_range_start);
-      assert(a_range.source_range_start == b_range.source_range_start);
-      assert(a_range.range_len == b_range.range_len);
+    assert(a.range_maps[i].interval_maps_len ==
+           b.range_maps[i].interval_maps_len);
+    for (size_t j = 0; j < a.range_maps[i].interval_maps_len; ++j) {
+      IntervalMap a_range = a.range_maps[i].interval_maps[j];
+      IntervalMap b_range = b.range_maps[i].interval_maps[j];
+      assert(interval_equal(a_range.src_interval, b_range.src_interval));
+      assert(interval_equal(a_range.dst_interval, b_range.dst_interval));
     }
   }
 }
@@ -26,154 +26,137 @@ void test_parse_input(void) {
   static const size_t expected_range_map_len = 7;
 
   static const size_t expected_seed_to_soil_ranges_len = 2;
-  Range expected_seed_to_soil_ranges[expected_seed_to_soil_ranges_len] = {
-      (Range){
-          .dest_range_start = 50,
-          .source_range_start = 98,
-          .range_len = 2,
+  IntervalMap expected_seed_to_soil_ranges[expected_seed_to_soil_ranges_len] = {
+      (IntervalMap){
+          .src_interval = (interval_interval){.start = 98, .end = 100},
+          .dst_interval = (interval_interval){.start = 50, .end = 52},
       },
-      (Range){
-          .dest_range_start = 52,
-          .source_range_start = 50,
-          .range_len = 48,
+      (IntervalMap){
+          .src_interval = (interval_interval){.start = 50, .end = 98},
+          .dst_interval = (interval_interval){.start = 52, .end = 100},
       },
   };
   RangeMap expected_seed_to_soil_range_map = {
-      .ranges = expected_seed_to_soil_ranges,
-      .ranges_len = expected_seed_to_soil_ranges_len,
+      .interval_maps = expected_seed_to_soil_ranges,
+      .interval_maps_len = expected_seed_to_soil_ranges_len,
   };
 
   static const size_t expected_soil_to_fertilizer_ranges_len = 3;
-  Range expected_soil_to_fertilizer_ranges
+  IntervalMap expected_soil_to_fertilizer_ranges
       [expected_soil_to_fertilizer_ranges_len] = {
-          (Range){
-              .dest_range_start = 0,
-              .source_range_start = 15,
-              .range_len = 37,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 15, .end = 52},
+              .dst_interval = (interval_interval){.start = 0, .end = 37},
           },
-          (Range){
-              .dest_range_start = 37,
-              .source_range_start = 52,
-              .range_len = 2,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 52, .end = 54},
+              .dst_interval = (interval_interval){.start = 37, .end = 39},
           },
-          (Range){
-              .dest_range_start = 39,
-              .source_range_start = 0,
-              .range_len = 15,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 0, .end = 15},
+              .dst_interval = (interval_interval){.start = 39, .end = 54},
           },
       };
   RangeMap expected_soil_to_fertilizer_range_map = {
-      .ranges = expected_soil_to_fertilizer_ranges,
-      .ranges_len = expected_soil_to_fertilizer_ranges_len,
+      .interval_maps = expected_soil_to_fertilizer_ranges,
+      .interval_maps_len = expected_soil_to_fertilizer_ranges_len,
   };
 
   static const size_t expected_fertilizer_to_water_ranges_len = 4;
-  Range expected_fertilizer_to_water_ranges
+  IntervalMap expected_fertilizer_to_water_ranges
       [expected_fertilizer_to_water_ranges_len] = {
-          (Range){
-              .dest_range_start = 49,
-              .source_range_start = 53,
-              .range_len = 8,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 53, .end = 61},
+              .dst_interval = (interval_interval){.start = 49, .end = 57},
           },
-          (Range){
-              .dest_range_start = 0,
-              .source_range_start = 11,
-              .range_len = 42,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 11, .end = 53},
+              .dst_interval = (interval_interval){.start = 0, .end = 42},
           },
-          (Range){
-              .dest_range_start = 42,
-              .source_range_start = 0,
-              .range_len = 7,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 0, .end = 7},
+              .dst_interval = (interval_interval){.start = 42, .end = 49},
           },
-          (Range){
-              .dest_range_start = 57,
-              .source_range_start = 7,
-              .range_len = 4,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 7, .end = 11},
+              .dst_interval = (interval_interval){.start = 57, .end = 61},
           },
       };
   RangeMap expected_fertilizer_to_water_range_map = {
-      .ranges = expected_fertilizer_to_water_ranges,
-      .ranges_len = expected_fertilizer_to_water_ranges_len,
+      .interval_maps = expected_fertilizer_to_water_ranges,
+      .interval_maps_len = expected_fertilizer_to_water_ranges_len,
   };
 
   static const size_t expected_water_to_light_ranges_len = 2;
-  Range expected_water_to_light_ranges[expected_water_to_light_ranges_len] = {
-      (Range){
-          .dest_range_start = 88,
-          .source_range_start = 18,
-          .range_len = 7,
-      },
-      (Range){
-          .dest_range_start = 18,
-          .source_range_start = 25,
-          .range_len = 70,
-      },
-  };
+  IntervalMap
+      expected_water_to_light_ranges[expected_water_to_light_ranges_len] = {
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 18, .end = 25},
+              .dst_interval = (interval_interval){.start = 88, .end = 95},
+          },
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 25, .end = 95},
+              .dst_interval = (interval_interval){.start = 18, .end = 88},
+          },
+      };
   RangeMap expected_water_to_light_range_map = {
-      .ranges = expected_water_to_light_ranges,
-      .ranges_len = expected_water_to_light_ranges_len,
+      .interval_maps = expected_water_to_light_ranges,
+      .interval_maps_len = expected_water_to_light_ranges_len,
   };
 
   static const size_t expected_light_to_temperature_ranges_len = 3;
-  Range expected_light_to_temperature_ranges
+  IntervalMap expected_light_to_temperature_ranges
       [expected_light_to_temperature_ranges_len] = {
-          (Range){
-              .dest_range_start = 45,
-              .source_range_start = 77,
-              .range_len = 23,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 77, .end = 100},
+              .dst_interval = (interval_interval){.start = 45, .end = 68},
           },
-          (Range){
-              .dest_range_start = 81,
-              .source_range_start = 45,
-              .range_len = 19,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 45, .end = 64},
+              .dst_interval = (interval_interval){.start = 81, .end = 100},
           },
-          (Range){
-              .dest_range_start = 68,
-              .source_range_start = 64,
-              .range_len = 13,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 64, .end = 77},
+              .dst_interval = (interval_interval){.start = 68, .end = 81},
           },
       };
   RangeMap expected_light_to_temperature_range_map = {
-      .ranges = expected_light_to_temperature_ranges,
-      .ranges_len = expected_light_to_temperature_ranges_len,
+      .interval_maps = expected_light_to_temperature_ranges,
+      .interval_maps_len = expected_light_to_temperature_ranges_len,
   };
 
   static const size_t expected_temperature_to_humidity_ranges_len = 2;
-  Range expected_temperature_to_humidity_ranges
+  IntervalMap expected_temperature_to_humidity_ranges
       [expected_temperature_to_humidity_ranges_len] = {
-          (Range){
-              .dest_range_start = 0,
-              .source_range_start = 69,
-              .range_len = 1,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 69, .end = 70},
+              .dst_interval = (interval_interval){.start = 0, .end = 1},
           },
-          (Range){
-              .dest_range_start = 1,
-              .source_range_start = 0,
-              .range_len = 69,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 0, .end = 69},
+              .dst_interval = (interval_interval){.start = 1, .end = 70},
           },
       };
   RangeMap expected_temperature_to_humidity_range_map = {
-      .ranges = expected_temperature_to_humidity_ranges,
-      .ranges_len = expected_temperature_to_humidity_ranges_len,
+      .interval_maps = expected_temperature_to_humidity_ranges,
+      .interval_maps_len = expected_temperature_to_humidity_ranges_len,
   };
 
   static const size_t expected_humidity_to_location_ranges_len = 2;
-  Range expected_humidity_to_location_ranges
+  IntervalMap expected_humidity_to_location_ranges
       [expected_humidity_to_location_ranges_len] = {
-          (Range){
-              .dest_range_start = 60,
-              .source_range_start = 56,
-              .range_len = 37,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 56, .end = 93},
+              .dst_interval = (interval_interval){.start = 60, .end = 97},
           },
-          (Range){
-              .dest_range_start = 56,
-              .source_range_start = 93,
-              .range_len = 4,
+          (IntervalMap){
+              .src_interval = (interval_interval){.start = 93, .end = 97},
+              .dst_interval = (interval_interval){.start = 56, .end = 60},
           },
       };
   RangeMap expected_humidity_to_location_range_map = {
-      .ranges = expected_humidity_to_location_ranges,
-      .ranges_len = expected_humidity_to_location_ranges_len,
+      .interval_maps = expected_humidity_to_location_ranges,
+      .interval_maps_len = expected_humidity_to_location_ranges_len,
   };
 
   RangeMap range_maps[expected_range_map_len] = {

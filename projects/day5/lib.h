@@ -3,14 +3,13 @@
 #include <stddef.h>
 
 typedef struct {
-  long dest_range_start;
-  long source_range_start;
-  long range_len;
-} Range;
+  interval_interval src_interval;
+  interval_interval dst_interval;
+} IntervalMap;
 
 typedef struct {
-  Range *ranges;
-  size_t ranges_len;
+  IntervalMap *interval_maps;
+  size_t interval_maps_len;
 } RangeMap;
 
 typedef struct {
@@ -19,11 +18,6 @@ typedef struct {
   RangeMap *range_maps;
   size_t range_maps_len;
 } Almanac;
-
-typedef struct {
-  interval_interval seed_interval;
-  interval_interval current_interval;
-} MappedInterval;
 
 long part1_lowest_location(Almanac almanac);
 long part2_lowest_location(Almanac almanac);
