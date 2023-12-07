@@ -1,5 +1,5 @@
+#include "./lib.h"
+#include "./parser.h"
 #include <assert.h>
 
-void test_foo(void) {}
-
-int main(void) { test_foo(); }
+int main(void) { assert(1 == 1); }

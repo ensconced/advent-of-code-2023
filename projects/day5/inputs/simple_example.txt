@@ -1,4 +1,0 @@
-seeds: 10 20
-
-seed-to-location map:
-90 10 20
