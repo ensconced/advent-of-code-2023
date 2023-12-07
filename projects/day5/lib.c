@@ -9,7 +9,6 @@
 
 const size_t mapped_intervals_capacity = 1028;
 
-// TODO - can we get rid of this function and use intersection instead?
 bool find_matching_interval_map(RangeMap range_map, long value,
                                 IntervalMap *result) {
   for (size_t i = 0; i < range_map.interval_maps_len; ++i) {
@@ -138,9 +137,6 @@ IntervalMap *get_interval_maps(Almanac almanac,
   IntervalMap *interval_maps =
       initial_interval_maps(almanac, &interval_maps_len);
 
-  printf("initial interval maps:\n");
-  print_interval_maps(interval_maps, interval_maps_len);
-
   size_t next_interval_maps_len = 0;
   for (size_t i = 0; i < almanac.range_maps_len; ++i) {
     RangeMap range_map = almanac.range_maps[i];
@@ -148,8 +144,6 @@ IntervalMap *get_interval_maps(Almanac almanac,
         interval_maps, interval_maps_len, range_map, &next_interval_maps_len);
     interval_maps = next_interval_maps;
     interval_maps_len = next_interval_maps_len;
-    printf("next interval maps:\n");
-    print_interval_maps(next_interval_maps, next_interval_maps_len);
   }
   *interval_maps_len_result = interval_maps_len;
   return interval_maps;
