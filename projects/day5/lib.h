@@ -1,5 +1,5 @@
 #pragma once
-#include "../utils/interval_utils/lib.h"
+#include "../utils/interval/lib.h"
 #include <stddef.h>
 
 typedef struct {
@@ -21,8 +21,8 @@ typedef struct {
 } Almanac;
 
 typedef struct {
-  Interval original_interval;
-  Interval current_interval;
+  interval_Interval original_interval;
+  interval_Interval current_interval;
 } MappedInterval;
 
 Almanac parse_input(char *input_path);
