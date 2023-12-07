@@ -1,11 +1,7 @@
 #pragma once
 #include "../utils/interval/lib.h"
+#include "./interval_map.h"
 #include <stddef.h>
-
-typedef struct {
-  interval_interval src_interval;
-  interval_interval dst_interval;
-} IntervalMap;
 
 typedef struct {
   IntervalMap *interval_maps;

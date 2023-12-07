@@ -1,5 +1,6 @@
 general
 
+- rename all structs etc to use module prefix and snake_case
 - fix (assert ... = true)
 - prefix all library functions/types
 - move MIN/MAX macros somewhere shareable

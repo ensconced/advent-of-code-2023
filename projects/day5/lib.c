@@ -1,5 +1,6 @@
 #include "./lib.h"
 #include "../utils/interval/lib.h"
+#include "./interval_map.h"
 #include <ctype.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -70,100 +71,24 @@ IntervalMap *initial_interval_maps(Almanac almanac,
   return mapped_intervals;
 }
 
-bool find_intersecting_dst_map(IntervalMap interval_map, RangeMap range_map,
-                               IntervalMap *result) {
-  // bool found = false;
+// TODO - we're checking intersection here but then sorta doing it again in
+// interval_map_merge_intersection?
+bool find_intersecting_interval_map(IntervalMap interval_map,
+                                    RangeMap range_map, IntervalMap *result) {
   for (size_t i = 0; i < range_map.interval_maps_len; ++i) {
-    IntervalMap range = range_map.interval_maps[i];
-    interval_interval intersection =
-        interval_intersection(interval_map.dst_interval, range.src_interval);
-    if (!interval_is_empty(intersection)) {
-      // if (found) {
-      //   printf("found multiple intersecting maps for %ld - %ld:\n",
-      //          interval_map.dst_interval.start,
-      //          interval_map.dst_interval.end);
-      //   printf("first map: %ld - %ld\n", result->src_interval.start,
-      //          result->src_interval.end);
-      //   printf("second map: %ld - %ld\n", range.src_interval.start,
-      //          range.src_interval.end);
-      //   // exit(EXIT_FAILURE);
-      // }
-      *result = range;
+    IntervalMap intersector = range_map.interval_maps[i];
+    if (!interval_is_empty(interval_intersection(interval_map.dst_interval,
+                                                 intersector.src_interval))) {
+      *result = intersector;
       return true;
-      // found = true;
     }
   }
   return false;
 }
 
-void add_new_interval_map(interval_interval new_interval_map_src_interval,
-                          long offset, IntervalMap origin_interval_map,
-                          IntervalMap *mapped_intervals,
-                          size_t *mapped_intervals_len) {
-  long connection_offset = new_interval_map_src_interval.start -
-                           origin_interval_map.dst_interval.start;
-  long new_interval_length =
-      new_interval_map_src_interval.end - new_interval_map_src_interval.start;
-  long seed_interval_start =
-      origin_interval_map.src_interval.start + connection_offset;
-
-  interval_interval src_interval = {
-      .start = seed_interval_start,
-      .end = seed_interval_start + new_interval_length,
-  };
-
-  if (*mapped_intervals_len == mapped_intervals_capacity) {
-    printf("mapped intervals buffer at capacity\n");
-    exit(EXIT_FAILURE);
-  }
-  interval_interval shifted_interval =
-      interval_shift(new_interval_map_src_interval, offset);
-  mapped_intervals[(*mapped_intervals_len)++] = (IntervalMap){
-      .src_interval = src_interval,
-      .dst_interval = shifted_interval,
-  };
-}
-
-void split_and_squash(IntervalMap interval_map, RangeMap range_map,
-                      IntervalMap *new_interval_maps,
-                      size_t *new_interval_maps_len) {
-  IntervalMap intersecting_dst_map;
-  if (find_intersecting_dst_map(interval_map, range_map,
-                                &intersecting_dst_map)) {
-
-    long offset = intersecting_dst_map.dst_interval.start -
-                  intersecting_dst_map.src_interval.start;
-
-    interval_interval intersection = interval_intersection(
-        interval_map.dst_interval, intersecting_dst_map.src_interval);
-
-    add_new_interval_map(intersection, offset, interval_map, new_interval_maps,
-                         new_interval_maps_len);
-
-    interval_difference_result difference =
-        interval_difference(interval_map.dst_interval, intersection);
-
-    if (difference.type == INTERVAL_SINGLE) {
-      if (!interval_is_empty(difference.data.single)) {
-
-        add_new_interval_map(difference.data.single, 0, interval_map,
-                             new_interval_maps, new_interval_maps_len);
-      }
-    } else if (difference.type == INTERVAL_PAIR) {
-      add_new_interval_map(difference.data.pair[0], 0, interval_map,
-                           new_interval_maps, new_interval_maps_len);
-      add_new_interval_map(difference.data.pair[1], 0, interval_map,
-                           new_interval_maps, new_interval_maps_len);
-    }
-  } else {
-    add_new_interval_map(interval_map.dst_interval, 0, interval_map,
-                         new_interval_maps, new_interval_maps_len);
-  }
-}
-
-IntervalMap *apply_interval_maps(IntervalMap *interval_maps,
-                                 size_t interval_maps_len, RangeMap range_map,
-                                 size_t *len_result) {
+IntervalMap *get_next_interval_maps(IntervalMap *interval_maps,
+                                    size_t interval_maps_len,
+                                    RangeMap range_map, size_t *len_result) {
   size_t new_interval_maps_len = 0;
 
   IntervalMap *new_interval_maps =
@@ -171,8 +96,28 @@ IntervalMap *apply_interval_maps(IntervalMap *interval_maps,
 
   for (size_t i = 0; i < interval_maps_len; ++i) {
     IntervalMap interval_map = interval_maps[i];
-    split_and_squash(interval_map, range_map, new_interval_maps,
-                     &new_interval_maps_len);
+    IntervalMap intersecting_interval_map;
+    if (find_intersecting_interval_map(interval_map, range_map,
+                                       &intersecting_interval_map)) {
+      IntervalMap merged = interval_map_merge_intersection(
+          interval_map, intersecting_interval_map);
+      new_interval_maps[new_interval_maps_len++] = merged;
+
+      interval_map_subtraction_result remainder =
+          interval_map_subtract_dst_interval(
+              interval_map, intersecting_interval_map.src_interval);
+
+      if (remainder.type == INTERVAL_MAP_SINGLE) {
+        if (!interval_is_empty(remainder.data.single.src_interval)) {
+          interval_maps[interval_maps_len++] = remainder.data.single;
+        }
+      } else if (remainder.type == INTERVAL_MAP_PAIR) {
+        interval_maps[interval_maps_len++] = remainder.data.pair[0];
+        interval_maps[interval_maps_len++] = remainder.data.pair[1];
+      }
+    } else {
+      new_interval_maps[new_interval_maps_len++] = interval_map;
+    }
   }
 
   free(interval_maps);
@@ -180,30 +125,41 @@ IntervalMap *apply_interval_maps(IntervalMap *interval_maps,
   return new_interval_maps;
 }
 
-IntervalMap *combine_interval_maps(Almanac almanac,
-                                   size_t *mapped_intervals_len_result) {
-  size_t mapped_intervals_len = 0;
-  IntervalMap *mapped_intervals =
-      initial_interval_maps(almanac, &mapped_intervals_len);
+void print_interval_maps(IntervalMap *interval_maps, size_t interval_maps_len) {
+  for (size_t i = 0; i < interval_maps_len; ++i) {
+    print_interval_map(interval_maps[i]);
+  }
+  printf("\n");
+}
 
-  size_t new_interval_maps_len = 0;
+IntervalMap *get_interval_maps(Almanac almanac,
+                               size_t *interval_maps_len_result) {
+  size_t interval_maps_len = 0;
+  IntervalMap *interval_maps =
+      initial_interval_maps(almanac, &interval_maps_len);
+
+  printf("initial interval maps:\n");
+  print_interval_maps(interval_maps, interval_maps_len);
+
+  size_t next_interval_maps_len = 0;
   for (size_t i = 0; i < almanac.range_maps_len; ++i) {
     RangeMap range_map = almanac.range_maps[i];
-    IntervalMap *new_interval_maps =
-        apply_interval_maps(mapped_intervals, mapped_intervals_len, range_map,
-                            &new_interval_maps_len);
-    mapped_intervals = new_interval_maps;
-    mapped_intervals_len = new_interval_maps_len;
+    IntervalMap *next_interval_maps = get_next_interval_maps(
+        interval_maps, interval_maps_len, range_map, &next_interval_maps_len);
+    interval_maps = next_interval_maps;
+    interval_maps_len = next_interval_maps_len;
+    printf("next interval maps:\n");
+    print_interval_maps(next_interval_maps, next_interval_maps_len);
   }
-  *mapped_intervals_len_result = mapped_intervals_len;
-  return mapped_intervals;
+  *interval_maps_len_result = interval_maps_len;
+  return interval_maps;
 }
 
 long part2_lowest_location(Almanac almanac) {
   long min = LONG_MAX;
   size_t mapped_intervals_len = 0;
   IntervalMap *mapped_intervals =
-      combine_interval_maps(almanac, &mapped_intervals_len);
+      get_interval_maps(almanac, &mapped_intervals_len);
   for (size_t i = 0; i < mapped_intervals_len; ++i) {
     long interval_start = mapped_intervals[i].dst_interval.start;
     if (interval_start < min) {
