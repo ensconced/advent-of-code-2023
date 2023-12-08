@@ -36,6 +36,25 @@ void test_take_numeric_string(void) {
   assert(strcmp(str2, " hello there") == 0);
 }
 
+void test_take_alphanumeric_string(void) {
+  char *str1 = "foo 1234 1a2b3c4d";
+  static const size_t buffer_capacity = 16;
+  char buffer[buffer_capacity];
+  take_alphanumeric_string(&str1, buffer, buffer_capacity);
+  assert(strcmp(buffer, "foo") == 0);
+  assert(strcmp(str1, " 1234 1a2b3c4d") == 0);
+
+  maybe_take_whitespace(&str1);
+  take_alphanumeric_string(&str1, buffer, buffer_capacity);
+  assert(strcmp(buffer, "1234") == 0);
+  assert(strcmp(str1, " 1a2b3c4d") == 0);
+
+  maybe_take_whitespace(&str1);
+  take_alphanumeric_string(&str1, buffer, buffer_capacity);
+  assert(strcmp(buffer, "1a2b3c4d") == 0);
+  assert(strcmp(str1, "") == 0);
+}
+
 void test_take_number(void) {
   char *str1 = "1234 hello there";
   unsigned long result = take_number(&str1);
@@ -120,6 +139,7 @@ int main(void) {
   test_take_string();
   test_maybe_take_string();
   test_take_numeric_string();
+  test_take_alphanumeric_string();
   test_take_number();
   test_maybe_take_numeric_string();
   test_maybe_take_whitespace();

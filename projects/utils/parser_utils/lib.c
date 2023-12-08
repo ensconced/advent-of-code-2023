@@ -37,13 +37,14 @@ bool maybe_take_string(char *word, char **str_pointer) {
   return false;
 }
 
-void take_numeric_string(char **str_pointer, char *result_buffer,
-                         size_t result_buffer_capacity) {
+void take_string_while_chars_match(char **str_pointer, char *result_buffer,
+                                   size_t result_buffer_capacity,
+                                   int (*test_char)(int)) {
   size_t result_len = 0;
   size_t i;
   for (i = 0;; ++i) {
     char possible_digit = (*str_pointer)[i];
-    if (isdigit(possible_digit)) {
+    if (test_char(possible_digit)) {
       if (i >= result_buffer_capacity - 1) {
         printf("ran out of space in result buffer\n");
         exit(EXIT_FAILURE);
@@ -61,6 +62,18 @@ void take_numeric_string(char **str_pointer, char *result_buffer,
 
   result_buffer[i] = '\0';
   (*str_pointer) += result_len;
+}
+
+void take_numeric_string(char **str_pointer, char *result_buffer,
+                         size_t result_buffer_capacity) {
+  take_string_while_chars_match(str_pointer, result_buffer,
+                                result_buffer_capacity, isdigit);
+}
+
+void take_alphanumeric_string(char **str_pointer, char *result_buffer,
+                              size_t result_buffer_capacity) {
+  take_string_while_chars_match(str_pointer, result_buffer,
+                                result_buffer_capacity, isalnum);
 }
 
 void maybe_take_numeric_string(char **str_pointer, char *result_buffer,
