@@ -4,45 +4,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/*
-ptr	-	pointer to the array to sort
-count	-	number of elements in the array
-size	-	size of each element in the array in bytes
-comp	-	comparison function which returns ​a negative integer value if
-the first argument is less than the second, a positive integer value if the
-first argument is greater than the second and zero if the arguments are
-equivalent. The signature of the comparison function should be equivalent to the
-following:
-
- int cmp(const void *a, const void *b);
-
-The function must not modify the objects passed to it and must return consistent
-results when called for the same objects, regardless of their positions in the
-array.
-*/
-
-bool is_five_of_a_kind(char *cards) {
+bool has_n_runs(char *cards, size_t target_run_count, size_t target_run_len) {
+  size_t run_count = 0;
+  size_t run_len = 0;
   for (size_t i = 0; i < 5; ++i) {
-    if (i == 0)
-      continue;
-    if (cards[i] != cards[i - 1])
-      return false;
-  }
-  return true;
-}
+    if (i == 0 || cards[i] == cards[i - 1]) {
+      run_len++;
+    } else {
+      run_len = 1;
+    }
 
-bool is_four_of_a_kind(char *cards) {
-  int not_matching = 0;
-  for (size_t i = 0; i < 5; ++i) {
-    if (i == 0)
-      continue;
-    if (cards[i] != cards[i - 1]) {
-      not_matching++;
-      if (not_matching > 1)
-        return false;
+    if (run_len == target_run_len) {
+      run_len = 0;
+      run_count++;
     }
   }
-  return true;
+  return run_count >= target_run_count;
 }
 
 bool is_full_house(char *cards) {
@@ -50,9 +27,9 @@ bool is_full_house(char *cards) {
   char b = '\0';
   for (size_t i = 0; i < 5; ++i) {
     char card = cards[i];
-    if (a == '\0') {
+    if (card != b && a == '\0') {
       a = card;
-    } else if (b == '\0') {
+    } else if (card != a && b == '\0') {
       b = card;
     } else if (card != a && card != b) {
       return false;
@@ -61,93 +38,18 @@ bool is_full_house(char *cards) {
   return true;
 }
 
-bool is_three_of_a_kind(char *cards) {
-  char seen_cards[] = {0, 0, 0};
-  char seen_card_counts[] = {0, 0, 0};
-
-  for (size_t i = 0; i < 5; ++i) {
-    bool placed = false;
-    char card = cards[i];
-    for (size_t j = 0; j < 3; ++j) {
-      if (card == seen_cards[j]) {
-        seen_card_counts[j]++;
-        placed = true;
-        if (seen_card_counts[j] >= 3)
-          return true;
-      }
-    }
-    if (!placed) {
-      for (size_t j = 0; j < 3; ++j) {
-        if (seen_cards[j] == 0) {
-          seen_cards[j] = card;
-          seen_card_counts[j]++;
-          break;
-        }
-      }
-    }
-  }
-  return false;
-}
-
-bool is_two_pair(char *cards) {
-  char seen_cards[] = {0, 0, 0};
-  char seen_card_counts[] = {0, 0, 0};
-
-  for (size_t i = 0; i < 5; ++i) {
-    bool placed = false;
-    char card = cards[i];
-    for (size_t j = 0; j < 3; ++j) {
-      if (card == seen_cards[j]) {
-        seen_card_counts[j]++;
-        placed = true;
-      }
-    }
-    if (!placed) {
-      for (size_t j = 0; j < 3; ++j) {
-        if (seen_cards[j] == 0) {
-          seen_cards[j] = card;
-          seen_card_counts[j]++;
-          break;
-        }
-      }
-    }
-  }
-  int pairs = 0;
-  for (size_t j = 0; j < 3; ++j) {
-    if (seen_card_counts[j] >= 2) {
-      pairs++;
-    }
-  }
-  return pairs >= 2;
-}
-
-bool is_one_pair(char *cards) {
-  int pair_count = 0;
-  char pair_card = '\0';
-  for (size_t i = 0; i < 5; ++i) {
-    char card = cards[i];
-    if (pair_card == '\0') {
-      pair_card = card;
-      pair_count++;
-    } else if (card == pair_card) {
-      pair_count++;
-    }
-  }
-  return pair_count >= 2;
-}
-
 HandKind classify_hand(Hand *hand) {
-  if (is_five_of_a_kind(hand->cards))
+  if (has_n_runs(hand->sorted_cards, 1, 5))
     return FIVE_OF_A_KIND;
-  if (is_four_of_a_kind(hand->cards))
+  if (has_n_runs(hand->sorted_cards, 1, 4))
     return FOUR_OF_A_KIND;
-  if (is_full_house(hand->cards))
+  if (is_full_house(hand->sorted_cards))
     return FULL_HOUSE;
-  if (is_three_of_a_kind(hand->cards))
+  if (has_n_runs(hand->sorted_cards, 1, 3))
     return THREE_OF_A_KIND;
-  if (is_two_pair(hand->cards))
+  if (has_n_runs(hand->sorted_cards, 2, 2))
     return TWO_PAIR;
-  if (is_one_pair(hand->cards))
+  if (has_n_runs(hand->sorted_cards, 1, 2))
     return ONE_PAIR;
   return HIGH_CARD;
 }
@@ -188,7 +90,39 @@ int part1(char *input_path) {
   int result = 0;
   for (size_t i = 0; i < hands.hands_len; ++i) {
     Hand hand = hands.hands[i];
-    printf("hand: %s, class: %d\n", hand.cards, classify_hand(&hand));
+    // printf("cards: %s, sorted_cards: %s, class: ", hand.cards,
+    //        hand.sorted_cards);
+    // HandKind hand_kind = classify_hand(&hand);
+    // switch (hand_kind) {
+    // case HIGH_CARD: {
+    //   printf("high card\n");
+    //   break;
+    // }
+    // case ONE_PAIR: {
+    //   printf("one pair\n");
+    //   break;
+    // }
+    // case TWO_PAIR: {
+    //   printf("two pair\n");
+    //   break;
+    // }
+    // case THREE_OF_A_KIND: {
+    //   printf("three of a kind\n");
+    //   break;
+    // }
+    // case FULL_HOUSE: {
+    //   printf("full house\n");
+    //   break;
+    // }
+    // case FOUR_OF_A_KIND: {
+    //   printf("four of a kind\n");
+    //   break;
+    // }
+    // case FIVE_OF_A_KIND: {
+    //   printf("five of a kind\n");
+    //   break;
+    // }
+    // }
     result += hand.bid * (int)(i + 1);
   }
   return result;
