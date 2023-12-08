@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+const char part1_card_ranks[] = "23456789TJQKA";
+const char part2_card_ranks[] = "J23456789TQKA";
+
 bool has_n_runs(char *cards, size_t target_run_count, size_t target_run_len) {
   size_t run_count = 0;
   size_t run_len = 0;
@@ -55,11 +58,10 @@ HandKind classify_hand(Hand *hand) {
 }
 
 int card_rank(char card) {
-  static const char card_ranks[] = "23456789TJQKA";
   for (size_t i = 0;; ++i) {
-    if (card_ranks[i] == card)
+    if (part1_card_ranks[i] == card)
       return (int)i;
-    if (card_ranks[i] == '\0') {
+    if (part1_card_ranks[i] == '\0') {
       printf("failed to find char %c in card ranks\n", card);
       exit(EXIT_FAILURE);
     }
@@ -90,39 +92,6 @@ int part1(char *input_path) {
   int result = 0;
   for (size_t i = 0; i < hands.hands_len; ++i) {
     Hand hand = hands.hands[i];
-    // printf("cards: %s, sorted_cards: %s, class: ", hand.cards,
-    //        hand.sorted_cards);
-    // HandKind hand_kind = classify_hand(&hand);
-    // switch (hand_kind) {
-    // case HIGH_CARD: {
-    //   printf("high card\n");
-    //   break;
-    // }
-    // case ONE_PAIR: {
-    //   printf("one pair\n");
-    //   break;
-    // }
-    // case TWO_PAIR: {
-    //   printf("two pair\n");
-    //   break;
-    // }
-    // case THREE_OF_A_KIND: {
-    //   printf("three of a kind\n");
-    //   break;
-    // }
-    // case FULL_HOUSE: {
-    //   printf("full house\n");
-    //   break;
-    // }
-    // case FOUR_OF_A_KIND: {
-    //   printf("four of a kind\n");
-    //   break;
-    // }
-    // case FIVE_OF_A_KIND: {
-    //   printf("five of a kind\n");
-    //   break;
-    // }
-    // }
     result += hand.bid * (int)(i + 1);
   }
   return result;
