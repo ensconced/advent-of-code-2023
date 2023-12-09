@@ -1,4 +1,4 @@
-PROJECTS = $(shell ls -d projects/*)
+PROJECTS = $(shell (find ./projects -mindepth 1 -maxdepth 1 -type d ! -name "utils"; find ./projects/utils -mindepth 1 -maxdepth 1 -type d))
 
 .PHONY: all new clean $(PROJECTS)
 
