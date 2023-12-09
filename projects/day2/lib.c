@@ -38,7 +38,7 @@ Round *maybe_take_round(char **str_pointer) {
   int draw_count;
   do {
     static const size_t num_buffer_capacity = 16;
-    char number_buffer[num_buffer_capacity];
+    char number_buffer[num_buffer_capacity] = "";
     maybe_take_numeric_string(str_pointer, number_buffer, num_buffer_capacity);
     draw_count = atoi(number_buffer);
 
