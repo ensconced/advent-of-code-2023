@@ -5,14 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-const size_t cards_per_hand = 5;
-const size_t cards_buffer_capacity = cards_per_hand + 1;
-
 int compare_chars(const void *a, const void *b) {
   return *(char *)a - *(char *)b;
 }
 
-Hands parse_input(char *input_path) {
+Hands parse_input(char *input_path, bool part2) {
   FileLines file_lines = read_file_lines(input_path);
   Hand *hands = malloc(file_lines.line_count * sizeof(Hand));
   if (hands == 0) {
@@ -24,12 +21,17 @@ Hands parse_input(char *input_path) {
     char *line = file_lines.lines[i];
     char *current_position_in_line = line;
 
-    char *cards = malloc(cards_buffer_capacity);
+    char *cards = malloc(cards_in_a_hand + 1);
     take_alphanumeric_string(&current_position_in_line, cards,
-                             cards_buffer_capacity);
+                             cards_in_a_hand + 1);
 
-    char *sorted_cards = malloc(cards_buffer_capacity);
+    char *sorted_cards = malloc(cards_in_a_hand + 1);
     strcpy(sorted_cards, cards);
+    if (part2) {
+      char *with_jokers_replaced = replace_jokers(cards);
+      free(sorted_cards);
+      sorted_cards = with_jokers_replaced;
+    }
     qsort(sorted_cards, 5, 1, compare_chars);
 
     maybe_take_whitespace(&current_position_in_line);

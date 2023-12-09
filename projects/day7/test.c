@@ -4,6 +4,8 @@
 #include <stdio.h>
 
 int main(void) {
-  assert(part1("./inputs/example_input.txt") == 6440);
-  assert(part1("./inputs/input.txt") == 250957639);
+  assert(get_result("./inputs/example_input.txt", false) == 6440);
+  assert(get_result("./inputs/input.txt", false) == 250957639);
+  assert(get_result("./inputs/example_input.txt", true) == 5905);
+  assert(get_result("./inputs/input.txt", true) == 251515496);
 }
