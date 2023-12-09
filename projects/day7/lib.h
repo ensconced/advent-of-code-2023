@@ -23,5 +23,8 @@ typedef enum {
   FIVE_OF_A_KIND,
 } HandKind;
 
+const size_t cards_in_a_hand;
+
 bool has_n_runs(char *cards, size_t target_run_count, size_t target_run_len);
-int part1(char *input_path);
+int get_result(char *input_path, bool part2);
+char *replace_jokers(char *cards);
