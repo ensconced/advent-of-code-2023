@@ -8,10 +8,6 @@ struct GraphNode {
   GraphNode *right;
 };
 
-typedef struct {
-  GraphNode *first;
-  GraphNode *last;
-} Graph;
-
-size_t count_steps(Graph graph, char *path, size_t path_len);
-Graph create_graph(ParsedInput parsed_input);
+size_t find_node_idx_by_id(ParsedInput parsed_input, char *id);
+size_t count_steps(GraphNode *start_node, GraphNode *end_node, char *path);
+GraphNode *create_graph(ParsedInput parsed_input);

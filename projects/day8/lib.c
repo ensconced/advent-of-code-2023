@@ -5,13 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-size_t count_steps(Graph graph, char *path, size_t path_len) {
+size_t count_steps(GraphNode *start_node, GraphNode *end_node, char *path) {
+  size_t path_len = strlen(path);
   size_t count = 0;
   size_t path_idx = 0;
-  GraphNode *current_node = graph.first;
-  while (current_node != graph.last) {
+
+  GraphNode *current_node = start_node;
+  while (current_node != end_node) {
     current_node =
         path[path_idx] == 'L' ? current_node->left : current_node->right;
+
     path_idx = (path_idx + 1) % path_len;
     count++;
   }
@@ -28,8 +31,13 @@ size_t find_node_idx_by_id(ParsedInput parsed_input, char *id) {
   exit(EXIT_FAILURE);
 }
 
-Graph create_graph(ParsedInput parsed_input) {
+GraphNode *create_graph(ParsedInput parsed_input) {
   GraphNode *graph_nodes = malloc(parsed_input.nodes_len * sizeof(GraphNode));
+  if (graph_nodes == 0) {
+    printf("failed to allocate graph nodes\n");
+    exit(EXIT_FAILURE);
+  }
+
   for (size_t i = 0; i < parsed_input.nodes_len; ++i) {
     graph_nodes[i] = (GraphNode){.left = 0, .right = 0};
   }
@@ -41,8 +49,5 @@ Graph create_graph(ParsedInput parsed_input) {
     graph_nodes[i].right = &graph_nodes[right_idx];
   }
 
-  return (Graph){
-      .first = &graph_nodes[find_node_idx_by_id(parsed_input, "AAA")],
-      .last = &graph_nodes[find_node_idx_by_id(parsed_input, "ZZZ")],
-  };
+  return graph_nodes;
 }
