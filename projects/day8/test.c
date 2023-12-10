@@ -1,9 +1,9 @@
-#include "./lib.h"
 #include "./parser.h"
+#include "./part1.h"
 #include <assert.h>
 #include <stdio.h>
 
 int main(void) {
-  assert(get_result("./inputs/example_input.txt") == 2);
-  assert(get_result("./inputs/input.txt") == 18113);
+  assert(part1("./inputs/example_input.txt") == 2);
+  assert(part1("./inputs/input.txt") == 18113);
 }
