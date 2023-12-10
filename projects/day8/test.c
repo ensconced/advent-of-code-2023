@@ -1,5 +1,6 @@
 #include "./parser.h"
 #include "./part1.h"
+#include "./part2.h"
 #include <assert.h>
 #include <stdio.h>
 
