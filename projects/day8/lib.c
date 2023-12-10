@@ -31,7 +31,7 @@ size_t find_node_idx_by_id(ParsedInput parsed_input, char *id) {
   exit(EXIT_FAILURE);
 }
 
-GraphNode *create_graph(ParsedInput parsed_input) {
+GraphNode *create_graph(ParsedInput parsed_input, bool part2) {
   GraphNode *graph_nodes = malloc(parsed_input.nodes_len * sizeof(GraphNode));
   if (graph_nodes == 0) {
     printf("failed to allocate graph nodes\n");
@@ -39,7 +39,16 @@ GraphNode *create_graph(ParsedInput parsed_input) {
   }
 
   for (size_t i = 0; i < parsed_input.nodes_len; ++i) {
-    graph_nodes[i] = (GraphNode){.left = 0, .right = 0};
+    ParsedNode parsed_node = parsed_input.nodes[i];
+
+    graph_nodes[i] = (GraphNode){
+        .left = 0,
+        .right = 0,
+        .is_start_node = part2 ? parsed_node.id[2] == 'A'
+                               : strcmp(parsed_node.id, "AAA") == 0,
+        .is_end_node = part2 ? parsed_node.id[2] == 'Z'
+                             : strcmp(parsed_node.id, "ZZZ") == 0,
+    };
   }
   for (size_t i = 0; i < parsed_input.nodes_len; ++i) {
     ParsedNode parsed_node = parsed_input.nodes[i];
