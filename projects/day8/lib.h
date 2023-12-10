@@ -1,17 +1,6 @@
 #pragma once
+#include "./parser.h"
 #include <stddef.h>
-
-typedef struct {
-  char *id;
-  char *left;
-  char *right;
-} ParsedNode;
-
-typedef struct {
-  ParsedNode *nodes;
-  size_t nodes_len;
-  char *path;
-} ParsedInput;
 
 typedef struct GraphNode GraphNode;
 struct GraphNode {
@@ -24,4 +13,5 @@ typedef struct {
   GraphNode *last;
 } Graph;
 
-size_t get_result(char *input_path);
+size_t count_steps(Graph graph, char *path, size_t path_len);
+Graph create_graph(ParsedInput parsed_input);

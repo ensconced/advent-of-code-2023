@@ -46,10 +46,3 @@ Graph create_graph(ParsedInput parsed_input) {
       .last = &graph_nodes[find_node_idx_by_id(parsed_input, "ZZZ")],
   };
 }
-
-size_t get_result(char *input_path) {
-  ParsedInput parsed_input = parse_input(input_path);
-  Graph graph = create_graph(parsed_input);
-  size_t path_len = strlen(parsed_input.path);
-  return count_steps(graph, parsed_input.path, path_len);
-}
