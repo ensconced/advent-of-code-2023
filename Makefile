@@ -5,7 +5,7 @@ PROJECTS = $(shell (find ./projects -mindepth 1 -maxdepth 1 -type d ! -name "uti
 all: $(PROJECTS)
 
 $(PROJECTS):
-	$(MAKE) test -C $@
+	@$(MAKE) test -C $@
 
 new:
 	cp -R ./projects/template ./projects/$(name)

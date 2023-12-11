@@ -1,5 +1,6 @@
 #include "./lib.h"
 #include <assert.h>
+#include <stdio.h>
 
 void test_contains(void) {
   interval_interval a = {.start = 100, .end = 200};
@@ -104,6 +105,7 @@ void test_difference(void) {
 }
 
 int main(void) {
+  printf("testing interval lib\n");
   test_contains();
   test_equals();
   test_is_empty();

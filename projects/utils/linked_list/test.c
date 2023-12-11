@@ -1,5 +1,6 @@
 #include "./lib.h"
 #include <assert.h>
+#include <stdio.h>
 
 void test_basics(void) {
   LinkedList list = {.head = 0};
@@ -112,6 +113,7 @@ void test_add_at_head(void) {
 }
 
 int main(void) {
+  printf("testing linked list lib\n");
   test_basics();
   test_remove_body();
   test_remove_head();

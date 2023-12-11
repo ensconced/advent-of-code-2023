@@ -21,8 +21,8 @@ BIN_DIR=bin
 SOURCES = $(shell echo ./*.c ../utils/*/lib.c | xargs -n 1 realpath 2>/dev/null | sort | uniq)
 
 $(BIN_DIR)/test: $(SOURCES)
-	mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $@ $^
+	@mkdir -p $(BIN_DIR)
+	@$(CC) $(CFLAGS) -o $@ $^
 
 test: $(BIN_DIR)/test
-	$<
+	@$<

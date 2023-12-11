@@ -88,6 +88,7 @@ void test_parse_input(void) {
 }
 
 int main(void) {
+  printf("testing day3\n");
   test_parse_input();
   assert(sum_part_numbers(parse_input("./inputs/example.txt")) == 4361);
 
