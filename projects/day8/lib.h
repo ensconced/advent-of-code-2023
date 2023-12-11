@@ -21,13 +21,20 @@ typedef struct {
   size_t timestamp;
 } MegaGraphPointer;
 
+typedef struct {
+  size_t *steps;
+  size_t steps_len;
+  size_t next_step_idx;
+} CyclePhaseDetails;
+
 typedef union {
   MegaGraphPointer cycle_detection_pointer;
-  // CyclePhaseDetails cycle;
+  CyclePhaseDetails cycle_phase_details;
 } PhaseDetails;
 
 typedef struct {
   GhostPhase phase;
+  GraphNode *start_node;
   MegaGraphPointer current_node;
   PhaseDetails details;
 } Ghost;

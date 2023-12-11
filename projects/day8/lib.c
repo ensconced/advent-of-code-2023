@@ -56,31 +56,73 @@ void advance(MegaGraphPointer *pointer, char *path, size_t path_len) {
   char direction = path[pointer->timestamp % path_len];
   pointer->graph_node =
       direction == 'L' ? pointer->graph_node->left : pointer->graph_node->right;
-  printf("timestamp before inc: %zu ", pointer->timestamp);
+  // printf("timestamp before inc: %zu ", pointer->timestamp);
   pointer->timestamp++;
-  printf(", timestamp after inc: %zu\n", pointer->timestamp);
+  // printf(", timestamp after inc: %zu\n", pointer->timestamp);
 }
 
-void advance_ghost_in_cycle_phase_to_next_end_node(Ghost *ghost, char *path,
-                                                   size_t path_len) {
-  printf("TODO - ghost: %p, path: %s, path_len: %zu\n", (void *)ghost, path,
-         path_len);
+void advance_ghost_in_cycle_phase_to_next_end_node(Ghost *ghost) {
+  ghost->current_node.timestamp +=
+      ghost->details.cycle_phase_details
+          .steps[ghost->details.cycle_phase_details.next_step_idx];
+
+  ghost->details.cycle_phase_details.next_step_idx =
+      (ghost->details.cycle_phase_details.next_step_idx + 1) %
+      ghost->details.cycle_phase_details.steps_len;
+}
+
+void transition_ghost_to_cycle_phase(Ghost *ghost, char *path,
+                                     size_t path_len) {
+  while (!ghost->current_node.graph_node->is_end_node) {
+    advance(&ghost->current_node, path, path_len);
+  }
+
+  MegaGraphPointer cycle_finder_pointer = ghost->current_node;
+
+  static const size_t steps_capacity = 128;
+  size_t *steps = malloc(steps_capacity * sizeof(size_t));
+  if (steps == 0) {
+    printf("failed to allocate steps");
+    exit(EXIT_FAILURE);
+  }
+  size_t steps_len = 0;
+
+  do {
+    size_t step_size = 0;
+    do {
+      advance(&cycle_finder_pointer, path, path_len);
+      step_size++;
+    } while (!cycle_finder_pointer.graph_node->is_end_node);
+
+    if (steps_len == steps_capacity - 1) {
+      printf("ran out of capacity in steps buffer\n");
+      exit(EXIT_FAILURE);
+    }
+    steps[steps_len++] = step_size;
+  } while (!mega_graph_nodes_are_equal(&cycle_finder_pointer,
+                                       &ghost->current_node, path_len));
+
+  ghost->phase = CYCLE;
+  ghost->details = (PhaseDetails){
+      .cycle_phase_details =
+          (CyclePhaseDetails){
+              .steps = steps,
+              .steps_len = steps_len,
+              .next_step_idx = 0,
+          },
+  };
 }
 
 void advance_ghost_in_tail_phase(Ghost *ghost, char *path, size_t path_len) {
   advance(&ghost->current_node, path, path_len);
-  // advance(&ghost->details.cycle_detection_pointer, path, path_len);
-  // advance(&ghost->details.cycle_detection_pointer, path, path_len);
-  // if (mega_graph_nodes_are_equal(&ghost->current_node,
-  //                                &ghost->details.cycle_detection_pointer,
-  //                                path_len)) {
-  //   // we found a cycle
-  //   printf("found a cycle!\n");
-  //   // TODO - find the cycle, with all the end nodes within it.
-  //   // transition the ghost into the cycle phase, and fulfil the intent of
-  //   this
-  //   // function call by advancing it to the next end node within the cycle
-  // }
+  advance(&ghost->details.cycle_detection_pointer, path, path_len);
+  advance(&ghost->details.cycle_detection_pointer, path, path_len);
+  if (mega_graph_nodes_are_equal(&ghost->current_node,
+                                 &ghost->details.cycle_detection_pointer,
+                                 path_len)) {
+    printf("found a cycle!\n");
+    transition_ghost_to_cycle_phase(ghost, path, path_len);
+  }
 }
 
 void advance_ghost_in_tail_phase_to_next_end_node(Ghost *ghost, char *path,
@@ -92,28 +134,29 @@ void advance_ghost_in_tail_phase_to_next_end_node(Ghost *ghost, char *path,
 
 void advance_ghost_to_next_end_node(Ghost *ghost, char *path, size_t path_len) {
   // TODO - use different technique for ghosts in cycle phase...
-  // if (ghost->phase == TAIL) {
-  advance_ghost_in_tail_phase_to_next_end_node(ghost, path, path_len);
-  // } else if (ghost->phase == CYCLE) {
-  //   advance_ghost_in_cycle_phase_to_next_end_node(ghost, path, path_len);
-  // } else {
-  //   printf("expected ghost to be either in tail phase or cycle phase\n");
-  //   exit(EXIT_FAILURE);
-  // }
+  if (ghost->phase == TAIL) {
+    advance_ghost_in_tail_phase_to_next_end_node(ghost, path, path_len);
+  } else if (ghost->phase == CYCLE) {
+    advance_ghost_in_cycle_phase_to_next_end_node(ghost);
+  } else {
+    printf("expected ghost to be either in tail phase or cycle phase\n");
+    exit(EXIT_FAILURE);
+  }
 }
 
 void advance_through_end_nodes_up_to_or_past_timestamp(Ghost *ghost,
                                                        size_t target_timestamp,
                                                        char *path,
                                                        size_t path_len) {
-  printf(
-      "advancing ghost %p through end nodes until it's up to or past %zu...\n",
-      (void *)ghost, target_timestamp);
+  // printf(
+  //     "advancing ghost %p through end nodes until it's up to or past
+  //     %zu...\n", (void *)ghost, target_timestamp);
 
   do {
-    printf("advancing_ghost_to_next_end_node. current timestamp: %zu, target "
-           "timestamp: %zu\n",
-           ghost->current_node.timestamp, target_timestamp);
+    // printf("advancing_ghost_to_next_end_node. current timestamp: %zu, target
+    // "
+    //        "timestamp: %zu\n",
+    //        ghost->current_node.timestamp, target_timestamp);
     advance_ghost_to_next_end_node(ghost, path, path_len);
   } while (ghost->current_node.timestamp < target_timestamp);
 }
@@ -134,6 +177,7 @@ Ghost *create_ghosts(GraphNode *graph_nodes, ParsedInput parsed_input,
       }
 
       ghosts[(*ghosts_len)++] = (Ghost){
+          .start_node = &graph_nodes[i],
           .phase = TAIL,
           .current_node =
               (MegaGraphPointer){
@@ -187,7 +231,7 @@ size_t get_result(char *input_path, bool part2) {
 
       if (i > 0 && ghost->current_node.timestamp !=
                        ghosts[i - 1].current_node.timestamp) {
-        printf("not all the timestamps match...\n");
+        // printf("not all the timestamps match...\n");
         all_timestamps_match = false;
       }
     }
