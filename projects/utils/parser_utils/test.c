@@ -2,6 +2,7 @@
 #include "./lib.h"
 #include <assert.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 
 void test_take_string(void) {
@@ -136,6 +137,7 @@ void test_take_whitespace_separated_numbers(void) {
 }
 
 int main(void) {
+  printf("testing parser utils\n");
   test_take_string();
   test_maybe_take_string();
   test_take_numeric_string();

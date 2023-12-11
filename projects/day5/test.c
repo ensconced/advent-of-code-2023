@@ -183,6 +183,7 @@ void test_parse_input(void) {
 }
 
 int main(void) {
+  printf("testing day5\n");
   test_parse_input();
   assert(part1_lowest_location(parse_input("./inputs/example_input.txt")) ==
          35);

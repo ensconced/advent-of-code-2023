@@ -143,6 +143,7 @@ void test_parse_line(void) {
 }
 
 int main(void) {
+  printf("testing day2\n");
   test_take_colour();
   test_take_header_returning_game_id();
   test_maybe_take_round();

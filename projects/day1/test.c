@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 int main(void) {
+  printf("testing day1\n");
   assert(sum_calibration_values("./inputs/part1_example.txt", false) == 142);
   assert(sum_calibration_values("./inputs/input.txt", false) == 55208);
   assert(sum_calibration_values("./inputs/part2_example.txt", true) == 281);
